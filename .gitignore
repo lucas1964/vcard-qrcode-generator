@@ -1,3 +1,6 @@
 output/
 *.png
 *.svg
+web/vendor/
+web/qr_output/
+web/composer.lock
