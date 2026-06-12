@@ -1,15 +1,7 @@
 <?php
 declare(strict_types=1);
 
-require_once __DIR__ . '/vendor/autoload.php';
-
-use Endroid\QrCode\QrCode;
-use Endroid\QrCode\ErrorCorrectionLevel;
-use Endroid\QrCode\Encoding\Encoding;
-use Endroid\QrCode\RoundBlockSizeMode;
-use Endroid\QrCode\Color\Color;
-use Endroid\QrCode\Writer\PngWriter;
-use Endroid\QrCode\Writer\SvgWriter;
+require_once __DIR__ . '/phpqrcode.php';
 
 header('Content-Type: application/json');
 
@@ -65,21 +57,10 @@ $baseName = preg_replace('/[^a-z0-9_\-]/', '_', $baseName);
 $pngPath  = "{$outDir}/{$baseName}.png";
 $svgPath  = "{$outDir}/{$baseName}.svg";
 
+// QR_ECLEVEL_M = error correction 15%, size 10 (~330px), margin 4
 try {
-    $qrCode = new QrCode(
-        data: $vcard,
-        encoding: new Encoding('UTF-8'),
-        errorCorrectionLevel: ErrorCorrectionLevel::Medium,
-        size: 600,
-        margin: 20,
-        roundBlockSizeMode: RoundBlockSizeMode::Margin,
-        foregroundColor: new Color(0, 0, 0),
-        backgroundColor: new Color(255, 255, 255),
-    );
-
-    (new PngWriter())->write($qrCode)->saveToFile($pngPath);
-    (new SvgWriter())->write($qrCode)->saveToFile($svgPath);
-
+    QRcode::png($vcard, $pngPath, QR_ECLEVEL_M, 10, 4);
+    QRcode::svg($vcard, $svgPath, QR_ECLEVEL_M, 10, 4);
 } catch (Throwable $e) {
     http_response_code(500);
     echo json_encode(['error' => 'Errore nella generazione del QR: ' . $e->getMessage()]);
