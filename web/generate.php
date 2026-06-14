@@ -11,7 +11,11 @@ $org       = trim($_POST['org']        ?? '');
 $tel       = trim($_POST['tel']        ?? '');
 $email     = trim($_POST['email']      ?? '');
 $web       = trim($_POST['web']        ?? '');
-$address   = trim($_POST['address']    ?? '');
+$street    = trim($_POST['street']     ?? '');
+$city      = trim($_POST['city']       ?? '');
+$province  = trim($_POST['province']   ?? '');
+$zip       = trim($_POST['zip']        ?? '');
+$country   = trim($_POST['country']    ?? '');
 
 if ($firstName === '' || $lastName === '') {
     http_response_code(400);
@@ -26,7 +30,11 @@ $org       = $sanitize($org);
 $tel       = $sanitize($tel);
 $email     = $sanitize($email);
 $web       = $sanitize($web);
-$address   = $sanitize($address);
+$street    = $sanitize($street);
+$city      = $sanitize($city);
+$province  = $sanitize($province);
+$zip       = $sanitize($zip);
+$country   = $sanitize($country);
 
 $lines = [
     'BEGIN:VCARD',
@@ -38,7 +46,8 @@ if ($org     !== '') $lines[] = "ORG:{$org}";
 if ($tel     !== '') $lines[] = "TEL;TYPE=CELL:{$tel}";
 if ($email   !== '') $lines[] = "EMAIL;TYPE=INTERNET:{$email}";
 if ($web     !== '') $lines[] = "URL:{$web}";
-if ($address !== '') $lines[] = "ADR;TYPE=WORK:;;{$address};;;;";
+$hasAddress = $street || $city || $province || $zip || $country;
+if ($hasAddress) $lines[] = "ADR;TYPE=WORK:;;{$street};{$city};{$province};{$zip};{$country}";
 $lines[] = 'END:VCARD';
 
 $vcard = implode("\n", $lines);

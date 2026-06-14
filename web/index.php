@@ -173,8 +173,30 @@
         </div>
 
         <div class="field">
-            <label>Indirizzo</label>
-            <input type="text" name="address" placeholder="Via Roma 1, Milano, Italia">
+            <label>Via e numero civico</label>
+            <input type="text" name="street" placeholder="Via Roma 1">
+        </div>
+
+        <div class="row">
+            <div class="field">
+                <label>Città</label>
+                <input type="text" name="city" placeholder="Milano">
+            </div>
+            <div class="field">
+                <label>Provincia</label>
+                <input type="text" name="province" placeholder="MI">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="field">
+                <label>CAP</label>
+                <input type="text" name="zip" placeholder="20100">
+            </div>
+            <div class="field">
+                <label>Nazione</label>
+                <input type="text" name="country" placeholder="Italia">
+            </div>
         </div>
 
         <button type="submit">Genera QR Code</button>
