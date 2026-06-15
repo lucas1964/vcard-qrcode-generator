@@ -1,7 +1,18 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/phpqrcode.php';
+
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    http_response_code(401);
+    header('Content-Type: application/json');
+    echo json_encode(['error' => 'Non autenticato.']);
+    exit;
+}
 
 header('Content-Type: application/json');
 
