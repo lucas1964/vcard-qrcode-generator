@@ -3,12 +3,6 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/db.php';
-require_once __DIR__ . '/PHPMailer.php';
-require_once __DIR__ . '/SMTP.php';
-require_once __DIR__ . '/PHPMailerException.php';
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
 
 session_start();
 
@@ -30,44 +24,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = $user->fetch();
 
         if ($user) {
-            // Genera OTP a 6 cifre
             $otp  = str_pad((string)random_int(0, 999999), 6, '0', STR_PAD_LEFT);
             $hash = hash('sha256', $otp);
             $exp  = date('Y-m-d H:i:s', strtotime('+' . OTP_EXPIRE_MINUTES . ' minutes'));
 
-            // Invalida OTP precedenti
             db()->prepare('UPDATE otp_tokens SET used = 1 WHERE user_id = ?')
                ->execute([$user['id']]);
 
-            // Salva nuovo OTP
             db()->prepare('INSERT INTO otp_tokens (user_id, token_hash, expires_at) VALUES (?, ?, ?)')
                ->execute([$user['id'], $hash, $exp]);
 
-            // Invia email
-            $mail = new PHPMailer(true);
-            try {
-                $mail->isSMTP();
-                $mail->Host       = SMTP_HOST;
-                $mail->SMTPAuth   = true;
-                $mail->Username   = SMTP_USER;
-                $mail->Password   = SMTP_PASS;
-                $mail->SMTPSecure = SMTP_ENCRYPTION;
-                $mail->Port       = SMTP_PORT;
-                $mail->CharSet    = 'UTF-8';
-                $mail->setFrom(SMTP_USER, SMTP_FROM_NAME);
-                $mail->addAddress($email);
-                $mail->Subject = 'Il tuo codice di accesso';
-                $mail->Body    = "Il tuo codice di accesso è:\n\n{$otp}\n\nValido per " . OTP_EXPIRE_MINUTES . " minuti.";
-                $mail->send();
+            $subject = 'Il tuo codice di accesso';
+            $body    = "Il tuo codice di accesso è:\n\n{$otp}\n\nValido per " . OTP_EXPIRE_MINUTES . " minuti.";
+            $headers = "From: " . SMTP_FROM_NAME . " <" . SMTP_USER . ">\r\n"
+                     . "Content-Type: text/plain; charset=UTF-8\r\n";
 
+            if (mail($email, $subject, $body, $headers)) {
                 $_SESSION['otp_user_id'] = $user['id'];
                 header('Location: verify.php');
                 exit;
-            } catch (Exception $e) {
-                $error = 'Errore invio email. Riprova o contatta l\'amministratore.';
+            } else {
+                $error = 'Errore invio email. Contatta l\'amministratore.';
             }
         } else {
-            // Stesso messaggio per non rivelare se l'email esiste
             $error = 'Se l\'email è registrata riceverai il codice a breve.';
         }
     }
