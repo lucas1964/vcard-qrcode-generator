@@ -8,7 +8,9 @@ header('Content-Type: application/json');
 $firstName = trim($_POST['first_name'] ?? '');
 $lastName  = trim($_POST['last_name']  ?? '');
 $org       = trim($_POST['org']        ?? '');
-$tel       = trim($_POST['tel']        ?? '');
+$title    = trim($_POST['title']    ?? '');
+$telWork  = trim($_POST['tel_work'] ?? '');
+$telCell  = trim($_POST['tel_cell'] ?? '');
 $email     = trim($_POST['email']      ?? '');
 $web       = trim($_POST['web']        ?? '');
 $street    = trim($_POST['street']     ?? '');
@@ -27,7 +29,9 @@ $sanitize = fn(string $v): string => preg_replace('/[\x00-\x1f\x7f]/', '', $v);
 $firstName = $sanitize($firstName);
 $lastName  = $sanitize($lastName);
 $org       = $sanitize($org);
-$tel       = $sanitize($tel);
+$title   = $sanitize($title);
+$telWork = $sanitize($telWork);
+$telCell = $sanitize($telCell);
 $email     = $sanitize($email);
 $web       = $sanitize($web);
 $street    = $sanitize($street);
@@ -43,8 +47,10 @@ $lines = [
     "FN:{$firstName} {$lastName}",
 ];
 if ($org     !== '') $lines[] = "ORG:{$org}";
-if ($tel     !== '') $lines[] = "TEL;TYPE=CELL:{$tel}";
-if ($email   !== '') $lines[] = "EMAIL;TYPE=INTERNET:{$email}";
+if ($title   !== '') $lines[] = "TITLE:{$title}";
+if ($telWork !== '') $lines[] = "TEL;TYPE=WORK,voice:{$telWork}";
+if ($telCell !== '') $lines[] = "TEL;TYPE=cell:{$telCell}";
+if ($email   !== '') $lines[] = "EMAIL;type=INTERNET;type=WORK;type=pref:{$email}";
 if ($web     !== '') $lines[] = "URL:{$web}";
 $hasAddress = $street || $city || $province || $zip || $country;
 if ($hasAddress) $lines[] = "ADR;TYPE=WORK:;;{$street};{$city};{$province};{$zip};{$country}";
@@ -68,8 +74,8 @@ $svgPath  = "{$outDir}/{$baseName}.svg";
 
 // QR_ECLEVEL_M = error correction 15%, size 10 (~330px), margin 4
 try {
-    QRcode::png($vcard, $pngPath, QR_ECLEVEL_M, 10, 4);
-    QRcode::svg($vcard, $svgPath, QR_ECLEVEL_M, 10, 4);
+    QRcode::png($vcard, $pngPath, QR_ECLEVEL_H, 10, 4);
+    QRcode::svg($vcard, $svgPath, QR_ECLEVEL_H, 10, 4);
 } catch (Throwable $e) {
     http_response_code(500);
     echo json_encode(['error' => 'Errore nella generazione del QR: ' . $e->getMessage()]);

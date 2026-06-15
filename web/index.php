@@ -158,8 +158,18 @@
         </div>
 
         <div class="field">
-            <label>Telefono</label>
-            <input type="tel" name="tel" placeholder="+39 333 1234567">
+            <label>Ruolo / Mansione</label>
+            <input type="text" name="title" placeholder="Finance Sales">
+        </div>
+
+        <div class="field">
+            <label>Telefono fisso</label>
+            <input type="tel" name="tel_work" placeholder="+39 011 9367533">
+        </div>
+
+        <div class="field">
+            <label>Cellulare</label>
+            <input type="tel" name="tel_cell" placeholder="+39 333 1234567">
         </div>
 
         <div class="field">
