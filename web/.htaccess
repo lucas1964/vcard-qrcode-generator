@@ -8,8 +8,9 @@ ServerSignature Off
     RewriteCond %{THE_REQUEST} /index\.php [NC]
     RewriteRule ^index\.php$ / [R=301,L]
 
-    # Rimuove .php dagli URL (es. /login.php → /login)
+    # Rimuove .php dagli URL — ESCLUDI i file che ricevono POST
     RewriteCond %{THE_REQUEST} \.php [NC]
+    RewriteCond %{REQUEST_URI} !^/(generate|download)\.php [NC]
     RewriteRule ^([^.]+)\.php$ /$1 [R=301,L]
 
     # Serve il file .php quando si visita l'URL senza estensione
