@@ -3,9 +3,19 @@ ServerSignature Off
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
+
     # Rimuove index.php dall'URL
     RewriteCond %{THE_REQUEST} /index\.php [NC]
     RewriteRule ^index\.php$ / [R=301,L]
+
+    # Rimuove .php dagli URL (es. /login.php → /login)
+    RewriteCond %{THE_REQUEST} \.php [NC]
+    RewriteRule ^([^.]+)\.php$ /$1 [R=301,L]
+
+    # Serve il file .php quando si visita l'URL senza estensione
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME}\.php -f
+    RewriteRule ^([^.]+)$ $1.php [L]
 </IfModule>
 
 <IfModule mod_headers.c>
