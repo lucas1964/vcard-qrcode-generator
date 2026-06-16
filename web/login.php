@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/csrf.php';
 require_once __DIR__ . '/PHPMailer.php';
 require_once __DIR__ . '/SMTP.php';
 require_once __DIR__ . '/PHPMailerException.php';
@@ -19,6 +20,7 @@ if (isset($_SESSION['user_id'])) {
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_verify();
     $email = trim(filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL) ?? '');
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -87,6 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label>Email</label>
             <input type="email" name="email" required autofocus placeholder="la-tua@email.com">
         </div>
+        <?= csrf_field() ?>
         <button type="submit">Invia codice</button>
     </form>
 </div>

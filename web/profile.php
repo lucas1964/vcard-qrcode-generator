@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/csrf.php';
 
 session_start();
 
@@ -15,6 +16,7 @@ $message = '';
 $msgType = 'success';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_verify();
     $sanitize = fn(string $v): string => preg_replace('/[\x00-\x1f\x7f]/', '', trim($v));
 
     $fields = ['first_name','last_name','org','title','tel_work','tel_cell','email','web','street','city','province','zip','country'];
@@ -122,6 +124,7 @@ function val(array $p, string $key): string {
                 <input type="text" name="country" value="<?= val($p, 'country') ?>" placeholder="Italia">
             </div>
         </div>
+        <?= csrf_field() ?>
         <button type="submit">Salva profilo</button>
         <a href="index.php" class="btn btn-secondary">Torna al generatore</a>
     </form>

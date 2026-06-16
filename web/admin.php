@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/csrf.php';
 
 session_start();
 
@@ -15,6 +16,10 @@ $message = '';
 $msgType = 'success';
 
 // Crea utente
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_verify();
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'create') {
     $email   = trim(filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL) ?? '');
     $isAdmin = isset($_POST['is_admin']) ? 1 : 0;
@@ -96,6 +101,7 @@ $users = db()->query(
                 </label>
             </div>
         </div>
+        <?= csrf_field() ?>
         <button type="submit">Crea utente</button>
     </form>
 
@@ -121,6 +127,7 @@ $users = db()->query(
                     <form method="post" onsubmit="return confirm('Eliminare questo utente?')">
                         <input type="hidden" name="action" value="delete">
                         <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
+                        <?= csrf_field() ?>
                         <button type="submit" class="btn btn-danger" style="width:auto;padding:.3rem .75rem;font-size:.8rem;margin:0">Elimina</button>
                     </form>
                     <?php endif; ?>

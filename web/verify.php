@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/csrf.php';
 
 session_start();
 
@@ -19,6 +20,7 @@ if (!isset($_SESSION['otp_user_id'])) {
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_verify();
     $otp = preg_replace('/\D/', '', $_POST['otp'] ?? '');
 
     if (strlen($otp) !== 6) {
@@ -77,6 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                    required autofocus placeholder="123456"
                    style="font-size:1.5rem;letter-spacing:.4rem;text-align:center">
         </div>
+        <?= csrf_field() ?>
         <button type="submit">Accedi</button>
     </form>
     <p style="margin-top:1rem;text-align:center;font-size:.85rem">
