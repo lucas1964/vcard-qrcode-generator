@@ -3,18 +3,25 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/csrf.php';
 require_once __DIR__ . '/phpqrcode.php';
 
 session_start();
 
+header('Content-Type: application/json');
+
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
-    header('Content-Type: application/json');
     echo json_encode(['error' => 'Non autenticato.']);
     exit;
 }
 
-header('Content-Type: application/json');
+$token = $_POST['csrf_token'] ?? '';
+if (!hash_equals(csrf_token(), $token)) {
+    http_response_code(403);
+    echo json_encode(['error' => 'Richiesta non valida.']);
+    exit;
+}
 
 $firstName = trim($_POST['first_name'] ?? '');
 $lastName  = trim($_POST['last_name']  ?? '');

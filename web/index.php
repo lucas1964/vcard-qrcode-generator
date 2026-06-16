@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/csrf.php';
 
 session_start();
 
@@ -112,6 +113,7 @@ function val(array $p, string $key): string {
             </div>
         </div>
 
+        <?= csrf_field() ?>
         <button type="submit">Genera QR Code</button>
     </form>
 
