@@ -18,26 +18,18 @@ if (!isset($_SESSION['user_id'])) {
 
 $token         = $_POST['csrf_token'] ?? '';
 $session_token = $_SESSION['csrf_token'] ?? '';
-
-// DEBUG TEMPORANEO — rimuovere dopo il test
-echo json_encode([
-    'debug' => true,
-    'session_id'    => session_id(),
-    'user_id'       => $_SESSION['user_id'] ?? null,
-    'session_token' => substr($session_token, 0, 8) . '...',
-    'post_token'    => substr($token, 0, 8) . '...',
-    'match'         => hash_equals($session_token ?: '', $token),
-    'post_keys'     => array_keys($_POST),
-]);
-exit;
-// FINE DEBUG
+if (!$session_token || !hash_equals($session_token, $token)) {
+    http_response_code(403);
+    echo json_encode(['error' => 'Richiesta non valida.']);
+    exit;
+}
 
 $firstName = trim($_POST['first_name'] ?? '');
 $lastName  = trim($_POST['last_name']  ?? '');
 $org       = trim($_POST['org']        ?? '');
-$title    = trim($_POST['title']    ?? '');
-$telWork  = trim($_POST['tel_work'] ?? '');
-$telCell  = trim($_POST['tel_cell'] ?? '');
+$title     = trim($_POST['title']      ?? '');
+$telWork   = trim($_POST['tel_work']   ?? '');
+$telCell   = trim($_POST['tel_cell']   ?? '');
 $email     = trim($_POST['email']      ?? '');
 $web       = trim($_POST['web']        ?? '');
 $street    = trim($_POST['street']     ?? '');
@@ -52,13 +44,13 @@ if ($firstName === '' || $lastName === '') {
     exit;
 }
 
-$sanitize = fn(string $v): string => preg_replace('/[\x00-\x1f\x7f]/', '', $v);
+$sanitize  = fn(string $v): string => preg_replace('/[\x00-\x1f\x7f]/', '', $v);
 $firstName = $sanitize($firstName);
 $lastName  = $sanitize($lastName);
 $org       = $sanitize($org);
-$title   = $sanitize($title);
-$telWork = $sanitize($telWork);
-$telCell = $sanitize($telCell);
+$title     = $sanitize($title);
+$telWork   = $sanitize($telWork);
+$telCell   = $sanitize($telCell);
 $email     = $sanitize($email);
 $web       = $sanitize($web);
 $street    = $sanitize($street);
@@ -79,15 +71,13 @@ if ($telWork !== '') $lines[] = "TEL;TYPE=WORK,voice:{$telWork}";
 if ($telCell !== '') $lines[] = "TEL;TYPE=cell:{$telCell}";
 if ($email   !== '') $lines[] = "EMAIL;type=INTERNET;type=WORK;type=pref:{$email}";
 if ($web     !== '') $lines[] = "URL:{$web}";
-$hasAddress = $street || $city || $province || $zip || $country;
-if ($hasAddress) $lines[] = "ADR;TYPE=WORK:;;{$street};{$city};{$province};{$zip};{$country}";
+if ($street || $city || $province || $zip || $country)
+    $lines[] = "ADR;TYPE=WORK:;;{$street};{$city};{$province};{$zip};{$country}";
 $lines[] = 'END:VCARD';
 
 $vcard = implode("\n", $lines);
 
-$outDir  = __DIR__ . '/qr_output';
-$urlBase = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/qr_output';
-
+$outDir = __DIR__ . '/qr_output';
 if (!is_dir($outDir) && !mkdir($outDir, 0755, true)) {
     http_response_code(500);
     echo json_encode(['error' => 'Impossibile creare la directory di output.']);
@@ -99,7 +89,6 @@ $baseName = preg_replace('/[^a-z0-9_\-]/', '_', $baseName);
 $pngPath  = "{$outDir}/{$baseName}.png";
 $svgPath  = "{$outDir}/{$baseName}.svg";
 
-// QR_ECLEVEL_M = error correction 15%, size 10 (~330px), margin 4
 try {
     QRcode::png($vcard, $pngPath, QR_ECLEVEL_H, 10, 4);
     QRcode::svg($vcard, $svgPath, QR_ECLEVEL_H, 10, 4);
@@ -109,8 +98,10 @@ try {
     exit;
 }
 
+// PNG come base64 per anteprima inline (evita problemi di sessione su GET)
+$pngBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($pngPath));
+
 echo json_encode([
-    'png'      => "{$urlBase}/{$baseName}.png",
-    'svg'      => "{$urlBase}/{$baseName}.svg",
-    'filename' => $baseName,
+    'png_inline' => $pngBase64,
+    'filename'   => $baseName,
 ]);

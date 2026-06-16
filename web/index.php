@@ -145,7 +145,7 @@ document.getElementById('form').addEventListener('submit', async function(e) {
             errorEl.style.display = 'block';
             return;
         }
-        document.getElementById('qr-img').src = 'download.php?f=' + json.filename + '.png&t=' + Date.now();
+        document.getElementById('qr-img').src = json.png_inline;
         document.getElementById('dl-png').href = 'download.php?f=' + json.filename + '.png';
         document.getElementById('dl-png').download = json.filename + '.png';
         document.getElementById('dl-svg').href = 'download.php?f=' + json.filename + '.svg';
