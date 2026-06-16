@@ -143,10 +143,10 @@ document.getElementById('form').addEventListener('submit', async function(e) {
             errorEl.style.display = 'block';
             return;
         }
-        document.getElementById('qr-img').src = json.png + '?t=' + Date.now();
-        document.getElementById('dl-png').href = json.png;
+        document.getElementById('qr-img').src = 'download.php?f=' + json.filename + '.png&t=' + Date.now();
+        document.getElementById('dl-png').href = 'download.php?f=' + json.filename + '.png';
         document.getElementById('dl-png').download = json.filename + '.png';
-        document.getElementById('dl-svg').href = json.svg;
+        document.getElementById('dl-svg').href = 'download.php?f=' + json.filename + '.svg';
         document.getElementById('dl-svg').download = json.filename + '.svg';
         resultEl.style.display = 'block';
         resultEl.scrollIntoView({ behavior: 'smooth' });

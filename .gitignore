@@ -1,4 +1,5 @@
 output/
 *.png
 *.svg
-web/qr_output/
+web/qr_output/*
+!web/qr_output/.htaccess
