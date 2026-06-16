@@ -17,6 +17,7 @@ define('SMTP_ENCRYPTION', 'tls');             // 'tls' oppure 'ssl'
 define('SMTP_USER',       'noreply@example.com');
 define('SMTP_PASS',       'password_smtp');
 define('SMTP_FROM_NAME',  'QR Code Generator');
+define('SMTP_REPLY_TO',   'consulenza@informaticavalsusa.it');
 
 // Admin (email dell'account amministratore)
 define('ADMIN_EMAIL', 'admin@example.com');

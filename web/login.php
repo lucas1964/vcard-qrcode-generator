@@ -50,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $mail->Port       = SMTP_PORT;
                 $mail->CharSet    = 'UTF-8';
                 $mail->setFrom(SMTP_USER, SMTP_FROM_NAME);
+                $mail->addReplyTo(SMTP_REPLY_TO);
                 $mail->addAddress($email);
                 $mail->Subject = 'Il tuo codice di accesso';
                 $mail->Body    = "Il tuo codice di accesso è:\n\n{$otp}\n\nValido per " . OTP_EXPIRE_MINUTES . " minuti.";
