@@ -16,8 +16,9 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-$token = $_POST['csrf_token'] ?? '';
-if (!hash_equals(csrf_token(), $token)) {
+$token         = $_POST['csrf_token'] ?? '';
+$session_token = $_SESSION['csrf_token'] ?? '';
+if (!$session_token || !hash_equals($session_token, $token)) {
     http_response_code(403);
     echo json_encode(['error' => 'Richiesta non valida.']);
     exit;
