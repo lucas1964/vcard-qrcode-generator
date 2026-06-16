@@ -1,6 +1,13 @@
 Options -Indexes
 ServerSignature Off
 
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Rimuove index.php dall'URL
+    RewriteCond %{THE_REQUEST} /index\.php [NC]
+    RewriteRule ^index\.php$ / [R=301,L]
+</IfModule>
+
 <IfModule mod_headers.c>
     Header unset X-Powered-By
     Header always unset X-Powered-By
