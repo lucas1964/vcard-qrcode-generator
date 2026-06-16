@@ -3,6 +3,11 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/PHPMailer.php';
+require_once __DIR__ . '/SMTP.php';
+require_once __DIR__ . '/PHPMailerException.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
 
 session_start();
 
@@ -34,16 +39,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             db()->prepare('INSERT INTO otp_tokens (user_id, token_hash, expires_at) VALUES (?, ?, ?)')
                ->execute([$user['id'], $hash, $exp]);
 
-            $subject = 'Il tuo codice di accesso';
-            $body    = "Il tuo codice di accesso è:\n\n{$otp}\n\nValido per " . OTP_EXPIRE_MINUTES . " minuti.";
-            $headers = "From: " . SMTP_FROM_NAME . " <" . SMTP_USER . ">\r\n"
-                     . "Content-Type: text/plain; charset=UTF-8\r\n";
+            $mail = new PHPMailer(true);
+            try {
+                $mail->isSMTP();
+                $mail->Host       = SMTP_HOST;
+                $mail->SMTPAuth   = true;
+                $mail->Username   = SMTP_USER;
+                $mail->Password   = SMTP_PASS;
+                $mail->SMTPSecure = SMTP_ENCRYPTION;
+                $mail->Port       = SMTP_PORT;
+                $mail->CharSet    = 'UTF-8';
+                $mail->setFrom(SMTP_USER, SMTP_FROM_NAME);
+                $mail->addAddress($email);
+                $mail->Subject = 'Il tuo codice di accesso';
+                $mail->Body    = "Il tuo codice di accesso è:\n\n{$otp}\n\nValido per " . OTP_EXPIRE_MINUTES . " minuti.";
+                $mail->send();
 
-            if (mail($email, $subject, $body, $headers)) {
                 $_SESSION['otp_user_id'] = $user['id'];
                 header('Location: verify.php');
                 exit;
-            } else {
+            } catch (Exception $e) {
                 $error = 'Errore invio email. Contatta l\'amministratore.';
             }
         } else {
