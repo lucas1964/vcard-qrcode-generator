@@ -35,3 +35,15 @@ CREATE TABLE IF NOT EXISTS otp_tokens (
     created_at DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS logs (
+    id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id    INT UNSIGNED NULL,
+    event      VARCHAR(50)  NOT NULL,
+    detail     JSON         NULL,
+    ip         VARCHAR(45)  NOT NULL DEFAULT '',
+    created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_event (event),
+    INDEX idx_user  (user_id),
+    INDEX idx_time  (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

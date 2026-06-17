@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/csrf.php';
+require_once __DIR__ . '/helpers.php';
 
 session_start();
 
@@ -29,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data['user_id'] = $_SESSION['user_id'];
 
     db()->prepare($sql)->execute($data);
+    write_log('profile_updated', $_SESSION['user_id']);
     $message = 'Profilo salvato.';
 }
 

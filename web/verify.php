@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/csrf.php';
+require_once __DIR__ . '/helpers.php';
 
 session_start();
 
@@ -44,14 +45,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_id'] = $_SESSION['otp_user_id'];
             unset($_SESSION['otp_user_id']);
 
-            // Controlla se è admin
             $u = db()->prepare('SELECT is_admin FROM users WHERE id = ?');
             $u->execute([$_SESSION['user_id']]);
             $_SESSION['is_admin'] = (bool)($u->fetch()['is_admin'] ?? false);
 
+            write_log('login_ok', $_SESSION['user_id']);
             header('Location: index.php');
             exit;
         } else {
+            write_log('login_failed', $_SESSION['otp_user_id'] ?? null, ['reason' => 'invalid_otp']);
             $error = 'Codice non valido o scaduto.';
         }
     }

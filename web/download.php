@@ -2,6 +2,8 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/helpers.php';
 
 session_start();
 
@@ -42,6 +44,8 @@ header('Cache-Control: no-store');
 header("Content-Security-Policy: default-src 'none'");
 // Evita sniffing del MIME da parte del browser.
 header('X-Content-Type-Options: nosniff');
+
+write_log('download', $_SESSION['user_id'], ['file' => $file]);
 
 readfile($path);
 exit;

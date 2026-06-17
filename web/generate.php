@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/csrf.php';
+require_once __DIR__ . '/helpers.php';
 require_once __DIR__ . '/phpqrcode.php';
 
 session_start();
@@ -19,6 +20,7 @@ if (!isset($_SESSION['user_id'])) {
 $token         = $_POST['csrf_token'] ?? '';
 $session_token = $_SESSION['csrf_token'] ?? '';
 if (!$session_token || !hash_equals($session_token, $token)) {
+    write_log('csrf_failed', $_SESSION['user_id'] ?? null, ['file' => 'generate.php']);
     http_response_code(403);
     echo json_encode(['error' => 'Richiesta non valida.']);
     exit;
@@ -98,7 +100,11 @@ try {
     exit;
 }
 
-// PNG come base64 per anteprima inline (evita problemi di sessione su GET)
+write_log('qr_generated', $_SESSION['user_id'], [
+    'name' => "{$firstName} {$lastName}",
+    'org'  => $org,
+]);
+
 $pngBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($pngPath));
 
 echo json_encode([

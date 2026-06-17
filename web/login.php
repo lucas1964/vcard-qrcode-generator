@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/csrf.php';
+require_once __DIR__ . '/helpers.php';
 require_once __DIR__ . '/PHPMailer.php';
 require_once __DIR__ . '/SMTP.php';
 require_once __DIR__ . '/PHPMailerException.php';
@@ -59,9 +60,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $mail->send();
 
                 $_SESSION['otp_user_id'] = $user['id'];
+                write_log('otp_requested', $user['id'], ['email' => $email]);
                 header('Location: verify.php');
                 exit;
             } catch (Exception $e) {
+                write_log('otp_send_failed', $user['id'], ['email' => $email, 'error' => $e->getMessage()]);
                 $error = 'Errore invio email. Contatta l\'amministratore.';
             }
         } else {

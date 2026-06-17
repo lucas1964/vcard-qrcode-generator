@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/csrf.php';
+require_once __DIR__ . '/helpers.php';
 
 session_start();
 
@@ -15,7 +16,6 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['is_admin'])) {
 $message = '';
 $msgType = 'success';
 
-// Crea utente
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_verify();
 }
@@ -31,11 +31,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'creat
         try {
             db()->prepare('INSERT INTO users (email, is_admin) VALUES (?, ?)')
                ->execute([$email, $isAdmin]);
-
-            // Crea profilo vuoto
             $uid = db()->lastInsertId();
             db()->prepare('INSERT INTO profiles (user_id) VALUES (?)')->execute([$uid]);
 
+            write_log('user_created', $_SESSION['user_id'], ['new_email' => $email, 'is_admin' => $isAdmin]);
             $message = "Utente {$email} creato.";
         } catch (PDOException $e) {
             $message = 'Email già registrata.';
@@ -44,11 +43,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'creat
     }
 }
 
-// Elimina utente
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete') {
     $uid = (int)($_POST['user_id'] ?? 0);
     if ($uid && $uid !== (int)$_SESSION['user_id']) {
+        // Recupera email prima di cancellare
+        $row = db()->prepare('SELECT email FROM users WHERE id = ?');
+        $row->execute([$uid]);
+        $deleted_email = $row->fetchColumn();
+
         db()->prepare('DELETE FROM users WHERE id = ?')->execute([$uid]);
+        write_log('user_deleted', $_SESSION['user_id'], ['deleted_email' => $deleted_email]);
         $message = 'Utente eliminato.';
     } else {
         $message = 'Non puoi eliminare te stesso.';
@@ -62,6 +66,27 @@ $users = db()->query(
      FROM users u LEFT JOIN profiles p ON p.user_id = u.id
      ORDER BY u.created_at DESC'
 )->fetchAll();
+
+// Ultimi 100 log
+$logs = db()->query(
+    'SELECT l.created_at, l.event, l.detail, l.ip, u.email
+     FROM logs l LEFT JOIN users u ON u.id = l.user_id
+     ORDER BY l.created_at DESC LIMIT 100'
+)->fetchAll();
+
+$eventLabels = [
+    'otp_requested'  => '📧 OTP richiesto',
+    'otp_send_failed'=> '❌ OTP fallito',
+    'login_ok'       => '✅ Login',
+    'login_failed'   => '⚠️ Login fallito',
+    'logout'         => '🚪 Logout',
+    'qr_generated'   => '🔲 QR generato',
+    'download'       => '⬇️ Download',
+    'csrf_failed'    => '🚨 CSRF fallito',
+    'user_created'   => '👤 Utente creato',
+    'user_deleted'   => '🗑️ Utente eliminato',
+    'profile_updated'=> '✏️ Profilo aggiornato',
+];
 ?>
 <!DOCTYPE html>
 <html lang="it">
@@ -72,7 +97,7 @@ $users = db()->query(
     <?php include __DIR__ . '/style.php'; ?>
 </head>
 <body>
-<div class="card">
+<div class="card" style="max-width:900px">
     <nav>
         <strong>Admin</strong>
         <div>
@@ -107,13 +132,7 @@ $users = db()->query(
 
     <table>
         <thead>
-            <tr>
-                <th>Email</th>
-                <th>Nome</th>
-                <th>Ruolo</th>
-                <th>Creato</th>
-                <th></th>
-            </tr>
+            <tr><th>Email</th><th>Nome</th><th>Ruolo</th><th>Creato</th><th></th></tr>
         </thead>
         <tbody>
         <?php foreach ($users as $u): ?>
@@ -132,6 +151,35 @@ $users = db()->query(
                     </form>
                     <?php endif; ?>
                 </td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+
+    <h1 style="margin-top:2.5rem">Log attività</h1>
+
+    <table style="font-size:.8rem">
+        <thead>
+            <tr><th>Data/ora</th><th>Evento</th><th>Utente</th><th>Dettaglio</th><th>IP</th></tr>
+        </thead>
+        <tbody>
+        <?php foreach ($logs as $log): ?>
+            <tr>
+                <td style="white-space:nowrap"><?= date('d/m/Y H:i:s', strtotime($log['created_at'])) ?></td>
+                <td style="white-space:nowrap"><?= $eventLabels[$log['event']] ?? htmlspecialchars($log['event']) ?></td>
+                <td><?= htmlspecialchars($log['email'] ?? '—') ?></td>
+                <td style="color:#52525b">
+                    <?php
+                    if ($log['detail']) {
+                        $d = json_decode($log['detail'], true);
+                        echo htmlspecialchars(implode(' | ', array_map(
+                            fn($k, $v) => "{$k}: {$v}",
+                            array_keys($d), $d
+                        )));
+                    }
+                    ?>
+                </td>
+                <td style="font-family:monospace"><?= htmlspecialchars($log['ip']) ?></td>
             </tr>
         <?php endforeach; ?>
         </tbody>
