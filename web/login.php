@@ -82,19 +82,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php include __DIR__ . '/style.php'; ?>
 </head>
 <body>
-<div class="card">
+<div class="auth-wrap">
+<div class="auth-card">
     <h1>Accesso</h1>
+
     <?php if ($error): ?>
-        <div class="message <?= str_contains($error, 'riceverai') ? 'info' : 'error' ?>"><?= htmlspecialchars($error) ?></div>
+        <div class="uk-alert-<?= str_contains($error, 'riceverai') ? 'primary' : 'danger' ?> uk-margin" uk-alert>
+            <p><?= htmlspecialchars($error) ?></p>
+        </div>
     <?php endif; ?>
+
     <form method="post">
-        <div class="field">
-            <label>Email</label>
-            <input type="email" name="email" required autofocus placeholder="la-tua@email.com">
+        <div class="uk-margin">
+            <label class="uk-form-label">Email</label>
+            <div class="uk-form-controls">
+                <input class="uk-input" type="email" name="email" required autofocus placeholder="la-tua@email.com">
+            </div>
         </div>
         <?= csrf_field() ?>
-        <button type="submit">Invia codice</button>
+        <button class="uk-button uk-button-primary uk-width-1-1 uk-margin-small-top" type="submit">Invia codice</button>
     </form>
+</div>
 </div>
 </body>
 </html>

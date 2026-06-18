@@ -51,90 +51,142 @@ function val(array $p, string $key): string {
     <?php include __DIR__ . '/style.php'; ?>
 </head>
 <body>
-<div class="card">
-    <nav>
-        <strong>Profilo</strong>
-        <div>
-            <a href="index.php">QR Generator</a> ·
-            <a href="logout.php">Esci</a>
-        </div>
-    </nav>
 
-    <h1>I tuoi dati</h1>
-    <p style="color:#52525b;font-size:.88rem;margin-bottom:1.25rem">Salvati qui una volta, il form QR si precompila automaticamente.</p>
+<?php include __DIR__ . '/sidebar.php'; ?>
+
+<div class="app-main">
+    <h1 class="page-title">I tuoi dati</h1>
+    <p class="page-subtitle">Salvati qui una volta, il form QR si precompila automaticamente.</p>
 
     <?php if ($message): ?>
-        <div class="message <?= $msgType ?>"><?= htmlspecialchars($message) ?></div>
+        <div class="uk-alert-<?= $msgType === 'error' ? 'danger' : 'success' ?> uk-margin" uk-alert>
+            <p><?= htmlspecialchars($message) ?></p>
+        </div>
     <?php endif; ?>
 
-    <form method="post">
-        <div class="row">
-            <div class="field">
-                <label>Nome</label>
-                <input type="text" name="first_name" value="<?= val($p, 'first_name') ?>" placeholder="Nome">
+    <form method="post" style="max-width:560px">
+
+        <div class="uk-grid-small" uk-grid>
+            <div class="uk-width-1-2@s">
+                <div class="uk-margin">
+                    <label class="uk-form-label">Nome</label>
+                    <div class="uk-form-controls">
+                        <input class="uk-input" type="text" name="first_name" value="<?= val($p, 'first_name') ?>" placeholder="Nome">
+                    </div>
+                </div>
             </div>
-            <div class="field">
-                <label>Cognome</label>
-                <input type="text" name="last_name" value="<?= val($p, 'last_name') ?>" placeholder="Cognome">
-            </div>
-        </div>
-        <div class="field">
-            <label>Azienda</label>
-            <input type="text" name="org" value="<?= val($p, 'org') ?>" placeholder="Nome azienda">
-        </div>
-        <div class="field">
-            <label>Ruolo / Mansione</label>
-            <input type="text" name="title" value="<?= val($p, 'title') ?>" placeholder="Es. Responsabile commerciale">
-        </div>
-        <div class="row">
-            <div class="field">
-                <label>Telefono fisso</label>
-                <input type="tel" name="tel_work" value="<?= val($p, 'tel_work') ?>" placeholder="+39 011 0000000">
-            </div>
-            <div class="field">
-                <label>Interno</label>
-                <input type="text" name="tel_ext" value="<?= val($p, 'tel_ext') ?>" placeholder="Es. 123">
+            <div class="uk-width-1-2@s">
+                <div class="uk-margin">
+                    <label class="uk-form-label">Cognome</label>
+                    <div class="uk-form-controls">
+                        <input class="uk-input" type="text" name="last_name" value="<?= val($p, 'last_name') ?>" placeholder="Cognome">
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="field">
-            <label>Cellulare</label>
-            <input type="tel" name="tel_cell" value="<?= val($p, 'tel_cell') ?>" placeholder="+39 333 0000000">
-        </div>
-        <div class="field">
-            <label>Email</label>
-            <input type="email" name="email" value="<?= val($p, 'email') ?>" placeholder="nome@azienda.it">
-        </div>
-        <div class="field">
-            <label>Sito web</label>
-            <input type="url" name="web" value="<?= val($p, 'web') ?>" placeholder="https://www.azienda.it">
-        </div>
-        <div class="field">
-            <label>Via e numero civico</label>
-            <input type="text" name="street" value="<?= val($p, 'street') ?>" placeholder="Via Esempio 1">
-        </div>
-        <div class="row">
-            <div class="field">
-                <label>Città</label>
-                <input type="text" name="city" value="<?= val($p, 'city') ?>" placeholder="Città">
-            </div>
-            <div class="field">
-                <label>Provincia</label>
-                <input type="text" name="province" value="<?= val($p, 'province') ?>" placeholder="TO">
+
+        <div class="uk-margin">
+            <label class="uk-form-label">Azienda</label>
+            <div class="uk-form-controls">
+                <input class="uk-input" type="text" name="org" value="<?= val($p, 'org') ?>" placeholder="Nome azienda">
             </div>
         </div>
-        <div class="row">
-            <div class="field">
-                <label>CAP</label>
-                <input type="text" name="zip" value="<?= val($p, 'zip') ?>" placeholder="00000">
-            </div>
-            <div class="field">
-                <label>Nazione</label>
-                <input type="text" name="country" value="<?= val($p, 'country') ?>" placeholder="Italia">
+
+        <div class="uk-margin">
+            <label class="uk-form-label">Ruolo / Mansione</label>
+            <div class="uk-form-controls">
+                <input class="uk-input" type="text" name="title" value="<?= val($p, 'title') ?>" placeholder="Es. Responsabile commerciale">
             </div>
         </div>
+
+        <div class="uk-grid-small" uk-grid>
+            <div class="uk-width-2-3@s">
+                <div class="uk-margin">
+                    <label class="uk-form-label">Telefono fisso</label>
+                    <div class="uk-form-controls">
+                        <input class="uk-input" type="tel" name="tel_work" value="<?= val($p, 'tel_work') ?>" placeholder="+39 011 0000000">
+                    </div>
+                </div>
+            </div>
+            <div class="uk-width-1-3@s">
+                <div class="uk-margin">
+                    <label class="uk-form-label">Interno</label>
+                    <div class="uk-form-controls">
+                        <input class="uk-input" type="text" name="tel_ext" value="<?= val($p, 'tel_ext') ?>" placeholder="Es. 123">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="uk-margin">
+            <label class="uk-form-label">Cellulare</label>
+            <div class="uk-form-controls">
+                <input class="uk-input" type="tel" name="tel_cell" value="<?= val($p, 'tel_cell') ?>" placeholder="+39 333 0000000">
+            </div>
+        </div>
+
+        <div class="uk-margin">
+            <label class="uk-form-label">Email</label>
+            <div class="uk-form-controls">
+                <input class="uk-input" type="email" name="email" value="<?= val($p, 'email') ?>" placeholder="nome@azienda.it">
+            </div>
+        </div>
+
+        <div class="uk-margin">
+            <label class="uk-form-label">Sito web</label>
+            <div class="uk-form-controls">
+                <input class="uk-input" type="url" name="web" value="<?= val($p, 'web') ?>" placeholder="https://www.azienda.it">
+            </div>
+        </div>
+
+        <div class="uk-margin">
+            <label class="uk-form-label">Via e numero civico</label>
+            <div class="uk-form-controls">
+                <input class="uk-input" type="text" name="street" value="<?= val($p, 'street') ?>" placeholder="Via Esempio 1">
+            </div>
+        </div>
+
+        <div class="uk-grid-small" uk-grid>
+            <div class="uk-width-1-2@s">
+                <div class="uk-margin">
+                    <label class="uk-form-label">Città</label>
+                    <div class="uk-form-controls">
+                        <input class="uk-input" type="text" name="city" value="<?= val($p, 'city') ?>" placeholder="Città">
+                    </div>
+                </div>
+            </div>
+            <div class="uk-width-1-2@s">
+                <div class="uk-margin">
+                    <label class="uk-form-label">Provincia</label>
+                    <div class="uk-form-controls">
+                        <input class="uk-input" type="text" name="province" value="<?= val($p, 'province') ?>" placeholder="TO">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="uk-grid-small" uk-grid>
+            <div class="uk-width-1-2@s">
+                <div class="uk-margin">
+                    <label class="uk-form-label">CAP</label>
+                    <div class="uk-form-controls">
+                        <input class="uk-input" type="text" name="zip" value="<?= val($p, 'zip') ?>" placeholder="00000">
+                    </div>
+                </div>
+            </div>
+            <div class="uk-width-1-2@s">
+                <div class="uk-margin">
+                    <label class="uk-form-label">Nazione</label>
+                    <div class="uk-form-controls">
+                        <input class="uk-input" type="text" name="country" value="<?= val($p, 'country') ?>" placeholder="Italia">
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <?= csrf_field() ?>
-        <button type="submit">Salva profilo</button>
-        <a href="index.php" class="btn btn-secondary">Torna al generatore</a>
+        <button class="uk-button uk-button-primary uk-width-1-1 uk-margin-small-top" type="submit">Salva profilo</button>
+        <a href="index.php" class="uk-button uk-button-default uk-width-1-1 uk-margin-small-top">Torna al generatore</a>
     </form>
 </div>
 </body>

@@ -46,7 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'creat
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete') {
     $uid = (int)($_POST['user_id'] ?? 0);
     if ($uid && $uid !== (int)$_SESSION['user_id']) {
-        // Recupera email prima di cancellare
         $row = db()->prepare('SELECT email FROM users WHERE id = ?');
         $row->execute([$uid]);
         $deleted_email = $row->fetchColumn();
@@ -67,7 +66,6 @@ $users = db()->query(
      ORDER BY u.created_at DESC'
 )->fetchAll();
 
-// Ultimi 100 log
 $logs = db()->query(
     'SELECT l.created_at, l.event, l.detail, l.ip, u.email
      FROM logs l LEFT JOIN users u ON u.id = l.user_id
@@ -97,57 +95,68 @@ $eventLabels = [
     <?php include __DIR__ . '/style.php'; ?>
 </head>
 <body>
-<div class="card" style="max-width:900px">
-    <nav>
-        <strong>Admin</strong>
-        <div>
-            <a href="index.php">QR Generator</a> ·
-            <a href="logout.php">Esci</a>
-        </div>
-    </nav>
 
-    <h1>Gestione utenti</h1>
+<?php include __DIR__ . '/sidebar.php'; ?>
+
+<div class="app-main">
+    <h1 class="page-title">Gestione utenti</h1>
 
     <?php if ($message): ?>
-        <div class="message <?= $msgType ?>"><?= htmlspecialchars($message) ?></div>
+        <div class="uk-alert-<?= $msgType === 'error' ? 'danger' : 'success' ?> uk-margin" uk-alert>
+            <p><?= htmlspecialchars($message) ?></p>
+        </div>
     <?php endif; ?>
 
-    <form method="post" style="margin-bottom:2rem">
+    <form method="post" class="uk-margin-medium-bottom">
         <input type="hidden" name="action" value="create">
-        <div class="row">
-            <div class="field">
-                <label>Email nuovo utente <span class="req">*</span></label>
-                <input type="email" name="email" required placeholder="utente@example.com">
+        <div class="uk-grid-small uk-flex-middle" uk-grid>
+            <div class="uk-width-expand">
+                <label class="uk-form-label">Email nuovo utente <span class="req">*</span></label>
+                <div class="uk-form-controls">
+                    <input class="uk-input" type="email" name="email" required placeholder="utente@example.com">
+                </div>
             </div>
-            <div class="field" style="display:flex;align-items:flex-end;padding-bottom:.1rem">
-                <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-weight:normal;color:#18181b">
-                    <input type="checkbox" name="is_admin" style="width:auto">
+            <div class="uk-width-auto uk-margin-top">
+                <label class="uk-flex uk-flex-middle" style="gap:.5rem;cursor:pointer;font-size:.875rem;color:#475569">
+                    <input type="checkbox" name="is_admin" class="uk-checkbox">
                     Admin
                 </label>
             </div>
         </div>
         <?= csrf_field() ?>
-        <button type="submit">Crea utente</button>
+        <button class="uk-button uk-button-primary uk-margin-small-top" type="submit">Crea utente</button>
     </form>
 
-    <table>
+    <table class="uk-table uk-table-divider uk-table-hover uk-table-small">
         <thead>
-            <tr><th>Email</th><th>Nome</th><th>Ruolo</th><th>Creato</th><th></th></tr>
+            <tr>
+                <th>Email</th>
+                <th>Nome</th>
+                <th>Ruolo</th>
+                <th>Creato</th>
+                <th></th>
+            </tr>
         </thead>
         <tbody>
         <?php foreach ($users as $u): ?>
             <tr>
                 <td><?= htmlspecialchars($u['email']) ?></td>
                 <td><?= htmlspecialchars(trim($u['display_name'])) ?></td>
-                <td><?= $u['is_admin'] ? 'Admin' : 'Utente' ?></td>
-                <td><?= date('d/m/Y', strtotime($u['created_at'])) ?></td>
+                <td>
+                    <?php if ($u['is_admin']): ?>
+                        <span class="uk-badge" style="background:#6366f1">Admin</span>
+                    <?php else: ?>
+                        <span class="uk-text-muted uk-text-small">Utente</span>
+                    <?php endif; ?>
+                </td>
+                <td class="uk-text-small"><?= date('d/m/Y', strtotime($u['created_at'])) ?></td>
                 <td>
                     <?php if ($u['id'] !== $_SESSION['user_id']): ?>
                     <form method="post" onsubmit="return confirm('Eliminare questo utente?')">
                         <input type="hidden" name="action" value="delete">
                         <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
                         <?= csrf_field() ?>
-                        <button type="submit" class="btn btn-danger" style="width:auto;padding:.3rem .75rem;font-size:.8rem;margin:0">Elimina</button>
+                        <button type="submit" class="uk-button uk-button-danger" style="padding:.25rem .6rem;font-size:.8rem;height:auto;line-height:1.5">Elimina</button>
                     </form>
                     <?php endif; ?>
                 </td>
@@ -156,11 +165,18 @@ $eventLabels = [
         </tbody>
     </table>
 
-    <h1 style="margin-top:2.5rem">Log attività</h1>
+    <h1 class="page-title uk-margin-large-top">Log attività</h1>
 
-    <table style="font-size:.8rem">
+    <div style="overflow-x:auto">
+    <table class="uk-table uk-table-divider uk-table-small" style="font-size:.8rem">
         <thead>
-            <tr><th>Data/ora</th><th>Evento</th><th>Utente</th><th>Dettaglio</th><th>IP</th></tr>
+            <tr>
+                <th>Data/ora</th>
+                <th>Evento</th>
+                <th>Utente</th>
+                <th>Dettaglio</th>
+                <th>IP</th>
+            </tr>
         </thead>
         <tbody>
         <?php foreach ($logs as $log): ?>
@@ -168,7 +184,7 @@ $eventLabels = [
                 <td style="white-space:nowrap"><?= date('d/m/Y H:i:s', strtotime($log['created_at'])) ?></td>
                 <td style="white-space:nowrap"><?= $eventLabels[$log['event']] ?? htmlspecialchars($log['event']) ?></td>
                 <td><?= htmlspecialchars($log['email'] ?? '—') ?></td>
-                <td style="color:#52525b">
+                <td class="uk-text-muted">
                     <?php
                     if ($log['detail']) {
                         $d = json_decode($log['detail'], true);
@@ -184,6 +200,7 @@ $eventLabels = [
         <?php endforeach; ?>
         </tbody>
     </table>
+    </div>
 </div>
 </body>
 </html>

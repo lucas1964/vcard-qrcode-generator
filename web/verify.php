@@ -68,25 +68,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php include __DIR__ . '/style.php'; ?>
 </head>
 <body>
-<div class="card">
+<div class="auth-wrap">
+<div class="auth-card">
     <h1>Inserisci il codice</h1>
-    <p style="color:#52525b;font-size:.9rem;margin-bottom:1.25rem">Abbiamo inviato un codice a 6 cifre alla tua email. Valido <?= OTP_EXPIRE_MINUTES ?> minuti.</p>
+    <p class="uk-text-muted uk-text-small uk-margin-small-bottom">Abbiamo inviato un codice a 6 cifre alla tua email. Valido <?= OTP_EXPIRE_MINUTES ?> minuti.</p>
+
     <?php if ($error): ?>
-        <div class="message error"><?= htmlspecialchars($error) ?></div>
+        <div class="uk-alert-danger uk-margin" uk-alert>
+            <p><?= htmlspecialchars($error) ?></p>
+        </div>
     <?php endif; ?>
+
     <form method="post">
-        <div class="field">
-            <label>Codice OTP</label>
-            <input type="text" name="otp" maxlength="6" pattern="\d{6}" inputmode="numeric"
-                   required autofocus placeholder="123456"
-                   style="font-size:1.5rem;letter-spacing:.4rem;text-align:center">
+        <div class="uk-margin">
+            <label class="uk-form-label">Codice OTP</label>
+            <div class="uk-form-controls">
+                <input class="uk-input uk-text-center" type="text" name="otp"
+                       maxlength="6" pattern="\d{6}" inputmode="numeric"
+                       required autofocus placeholder="123456"
+                       style="font-size:1.5rem;letter-spacing:.4rem">
+            </div>
         </div>
         <?= csrf_field() ?>
-        <button type="submit">Accedi</button>
+        <button class="uk-button uk-button-primary uk-width-1-1 uk-margin-small-top" type="submit">Accedi</button>
     </form>
-    <p style="margin-top:1rem;text-align:center;font-size:.85rem">
-        <a href="login.php" style="color:#6366f1">Richiedi un nuovo codice</a>
+
+    <p class="uk-text-center uk-text-small uk-margin-top">
+        <a href="login.php" class="uk-link-muted">Richiedi un nuovo codice</a>
     </p>
+</div>
 </div>
 </body>
 </html>
