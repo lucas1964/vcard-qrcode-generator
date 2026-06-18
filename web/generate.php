@@ -31,6 +31,7 @@ $lastName  = trim($_POST['last_name']  ?? '');
 $org       = trim($_POST['org']        ?? '');
 $title     = trim($_POST['title']      ?? '');
 $telWork   = trim($_POST['tel_work']   ?? '');
+$telExt    = trim($_POST['tel_ext']    ?? '');
 $telCell   = trim($_POST['tel_cell']   ?? '');
 $email     = trim($_POST['email']      ?? '');
 $web       = trim($_POST['web']        ?? '');
@@ -52,6 +53,7 @@ $lastName  = $sanitize($lastName);
 $org       = $sanitize($org);
 $title     = $sanitize($title);
 $telWork   = $sanitize($telWork);
+$telExt    = preg_replace('/\D/', '', $telExt); // solo cifre
 $telCell   = $sanitize($telCell);
 $email     = $sanitize($email);
 $web       = $sanitize($web);
@@ -69,7 +71,10 @@ $lines = [
 ];
 if ($org     !== '') $lines[] = "ORG:{$org}";
 if ($title   !== '') $lines[] = "TITLE:{$title}";
-if ($telWork !== '') $lines[] = "TEL;TYPE=WORK,voice:{$telWork}";
+if ($telWork !== '') {
+    $telWorkFull = $telExt !== '' ? "{$telWork},,{$telExt}" : $telWork;
+    $lines[] = "TEL;TYPE=WORK,voice:{$telWorkFull}";
+}
 if ($telCell !== '') $lines[] = "TEL;TYPE=cell:{$telCell}";
 if ($email   !== '') $lines[] = "EMAIL;type=INTERNET;type=WORK;type=pref:{$email}";
 if ($web     !== '') $lines[] = "URL:{$web}";

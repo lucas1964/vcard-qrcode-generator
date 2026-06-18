@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_verify();
     $sanitize = fn(string $v): string => preg_replace('/[\x00-\x1f\x7f]/', '', trim($v));
 
-    $fields = ['first_name','last_name','org','title','tel_work','tel_cell','email','web','street','city','province','zip','country'];
+    $fields = ['first_name','last_name','org','title','tel_work','tel_ext','tel_cell','email','web','street','city','province','zip','country'];
     $data   = [];
     foreach ($fields as $f) {
         $data[$f] = $sanitize($_POST[$f] ?? '');
@@ -86,9 +86,15 @@ function val(array $p, string $key): string {
             <label>Ruolo / Mansione</label>
             <input type="text" name="title" value="<?= val($p, 'title') ?>" placeholder="Finance Sales">
         </div>
-        <div class="field">
-            <label>Telefono fisso</label>
-            <input type="tel" name="tel_work" value="<?= val($p, 'tel_work') ?>" placeholder="+39 011 9367533">
+        <div class="row">
+            <div class="field">
+                <label>Telefono fisso</label>
+                <input type="tel" name="tel_work" value="<?= val($p, 'tel_work') ?>" placeholder="+39 011 9367533">
+            </div>
+            <div class="field">
+                <label>Interno</label>
+                <input type="text" name="tel_ext" value="<?= val($p, 'tel_ext') ?>" placeholder="123">
+            </div>
         </div>
         <div class="field">
             <label>Cellulare</label>

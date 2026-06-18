@@ -66,9 +66,15 @@ function val(array $p, string $key): string {
             <input type="text" name="title" placeholder="Finance Sales" value="<?= val($p, 'title') ?>">
         </div>
 
-        <div class="field">
-            <label>Telefono fisso</label>
-            <input type="tel" name="tel_work" placeholder="+39 011 9367533" value="<?= val($p, 'tel_work') ?>">
+        <div class="row">
+            <div class="field">
+                <label>Telefono fisso</label>
+                <input type="tel" name="tel_work" placeholder="+39 011 9367533" value="<?= val($p, 'tel_work') ?>">
+            </div>
+            <div class="field">
+                <label>Interno</label>
+                <input type="text" name="tel_ext" placeholder="123" value="<?= val($p, 'tel_ext') ?>">
+            </div>
         </div>
 
         <div class="field">

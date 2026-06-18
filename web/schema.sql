@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS profiles (
     org        VARCHAR(150) DEFAULT '',
     title      VARCHAR(150) DEFAULT '',
     tel_work   VARCHAR(50)  DEFAULT '',
+    tel_ext    VARCHAR(20)  DEFAULT '',
     tel_cell   VARCHAR(50)  DEFAULT '',
     email      VARCHAR(255) DEFAULT '',
     web        VARCHAR(255) DEFAULT '',
