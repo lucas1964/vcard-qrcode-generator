@@ -179,25 +179,50 @@ $eventLabels = [
             </tr>
         </thead>
         <tbody>
-        <?php foreach ($logs as $log): ?>
+        <?php $loop_i = 0; foreach ($logs as $log): ?>
             <tr>
                 <td style="white-space:nowrap"><?= date('d/m/Y H:i:s', strtotime($log['created_at'])) ?></td>
                 <td style="white-space:nowrap"><?= $eventLabels[$log['event']] ?? htmlspecialchars($log['event']) ?></td>
                 <td><?= htmlspecialchars($log['email'] ?? '—') ?></td>
                 <td class="uk-text-muted">
-                    <?php
-                    if ($log['detail']) {
-                        $d = json_decode($log['detail'], true);
-                        echo htmlspecialchars(implode(' | ', array_map(
-                            fn($k, $v) => "{$k}: {$v}",
-                            array_keys($d), $d
-                        )));
-                    }
-                    ?>
+                    <?php if ($log['detail']): ?>
+                        <?php
+                        $d       = json_decode($log['detail'], true);
+                        $preview = implode(', ', array_map(fn($k, $v) => "{$k}: {$v}", array_keys($d), $d));
+                        $modalId = 'log-detail-' . $loop_i;
+                        ?>
+                        <span style="max-width:180px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle">
+                            <?= htmlspecialchars($preview) ?>
+                        </span>
+                        <a href="#<?= $modalId ?>" uk-toggle style="margin-left:.35rem;font-size:.75rem;white-space:nowrap" title="Espandi">
+                            <span uk-icon="icon: expand; ratio: .75"></span>
+                        </a>
+                        <div id="<?= $modalId ?>" uk-modal>
+                            <div class="uk-modal-dialog uk-modal-body" style="max-width:480px">
+                                <button class="uk-modal-close-default" type="button" uk-close></button>
+                                <h3 class="uk-modal-title" style="font-size:1rem">
+                                    <?= $eventLabels[$log['event']] ?? htmlspecialchars($log['event']) ?>
+                                    <span class="uk-text-muted uk-text-small" style="font-weight:normal;margin-left:.5rem">
+                                        <?= date('d/m/Y H:i:s', strtotime($log['created_at'])) ?>
+                                    </span>
+                                </h3>
+                                <table class="uk-table uk-table-small uk-table-divider uk-margin-remove-top">
+                                    <tbody>
+                                    <?php foreach ($d as $k => $v): ?>
+                                        <tr>
+                                            <td style="font-weight:600;color:#475569;white-space:nowrap;width:1%"><?= htmlspecialchars($k) ?></td>
+                                            <td style="font-family:monospace;word-break:break-all"><?= htmlspecialchars((string)$v) ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                 </td>
                 <td style="font-family:monospace"><?= htmlspecialchars($log['ip']) ?></td>
             </tr>
-        <?php endforeach; ?>
+        <?php $loop_i++; endforeach; ?>
         </tbody>
     </table>
     </div>
