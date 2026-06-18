@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <form method="post">
         <div class="uk-margin">
-            <label class="uk-form-label">Email</label>
+            <label class="uk-form-label" style="display:block;text-align:center">Email</label>
             <div class="uk-form-controls">
                 <input class="uk-input" type="email" name="email" required autofocus placeholder="la-tua@email.com">
             </div>

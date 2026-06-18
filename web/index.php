@@ -172,6 +172,13 @@ function val(array $p, string $key): string {
 </div>
 
 <script>
+document.querySelectorAll('input[type="tel"]').forEach(function(el) {
+    el.addEventListener('blur', function() {
+        var v = this.value.trim();
+        if (v && !v.startsWith('+')) this.value = '+39 ' + v;
+    });
+});
+
 document.getElementById('form').addEventListener('submit', async function(e) {
     e.preventDefault();
     const errorEl = document.getElementById('error');

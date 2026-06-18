@@ -189,5 +189,13 @@ function val(array $p, string $key): string {
         <a href="index.php" class="uk-button uk-button-default uk-width-1-1 uk-margin-small-top">Torna al generatore</a>
     </form>
 </div>
+<script>
+document.querySelectorAll('input[type="tel"]').forEach(function(el) {
+    el.addEventListener('blur', function() {
+        var v = this.value.trim();
+        if (v && !v.startsWith('+')) this.value = '+39 ' + v;
+    });
+});
+</script>
 </body>
 </html>
