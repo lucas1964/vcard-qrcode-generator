@@ -71,61 +71,61 @@ function val(array $p, string $key): string {
         <div class="row">
             <div class="field">
                 <label>Nome</label>
-                <input type="text" name="first_name" value="<?= val($p, 'first_name') ?>" placeholder="Mario">
+                <input type="text" name="first_name" value="<?= val($p, 'first_name') ?>" placeholder="Nome">
             </div>
             <div class="field">
                 <label>Cognome</label>
-                <input type="text" name="last_name" value="<?= val($p, 'last_name') ?>" placeholder="Rossi">
+                <input type="text" name="last_name" value="<?= val($p, 'last_name') ?>" placeholder="Cognome">
             </div>
         </div>
         <div class="field">
             <label>Azienda</label>
-            <input type="text" name="org" value="<?= val($p, 'org') ?>" placeholder="Acme Srl">
+            <input type="text" name="org" value="<?= val($p, 'org') ?>" placeholder="Nome azienda">
         </div>
         <div class="field">
             <label>Ruolo / Mansione</label>
-            <input type="text" name="title" value="<?= val($p, 'title') ?>" placeholder="Finance Sales">
+            <input type="text" name="title" value="<?= val($p, 'title') ?>" placeholder="Es. Responsabile commerciale">
         </div>
         <div class="row">
             <div class="field">
                 <label>Telefono fisso</label>
-                <input type="tel" name="tel_work" value="<?= val($p, 'tel_work') ?>" placeholder="+39 011 9367533">
+                <input type="tel" name="tel_work" value="<?= val($p, 'tel_work') ?>" placeholder="+39 011 0000000">
             </div>
             <div class="field">
                 <label>Interno</label>
-                <input type="text" name="tel_ext" value="<?= val($p, 'tel_ext') ?>" placeholder="123">
+                <input type="text" name="tel_ext" value="<?= val($p, 'tel_ext') ?>" placeholder="Es. 123">
             </div>
         </div>
         <div class="field">
             <label>Cellulare</label>
-            <input type="tel" name="tel_cell" value="<?= val($p, 'tel_cell') ?>" placeholder="+39 333 1234567">
+            <input type="tel" name="tel_cell" value="<?= val($p, 'tel_cell') ?>" placeholder="+39 333 0000000">
         </div>
         <div class="field">
             <label>Email</label>
-            <input type="email" name="email" value="<?= val($p, 'email') ?>" placeholder="mario@example.com">
+            <input type="email" name="email" value="<?= val($p, 'email') ?>" placeholder="nome@azienda.it">
         </div>
         <div class="field">
             <label>Sito web</label>
-            <input type="url" name="web" value="<?= val($p, 'web') ?>" placeholder="https://example.com">
+            <input type="url" name="web" value="<?= val($p, 'web') ?>" placeholder="https://www.azienda.it">
         </div>
         <div class="field">
             <label>Via e numero civico</label>
-            <input type="text" name="street" value="<?= val($p, 'street') ?>" placeholder="Via Roma 1">
+            <input type="text" name="street" value="<?= val($p, 'street') ?>" placeholder="Via Esempio 1">
         </div>
         <div class="row">
             <div class="field">
                 <label>Città</label>
-                <input type="text" name="city" value="<?= val($p, 'city') ?>" placeholder="Milano">
+                <input type="text" name="city" value="<?= val($p, 'city') ?>" placeholder="Città">
             </div>
             <div class="field">
                 <label>Provincia</label>
-                <input type="text" name="province" value="<?= val($p, 'province') ?>" placeholder="MI">
+                <input type="text" name="province" value="<?= val($p, 'province') ?>" placeholder="TO">
             </div>
         </div>
         <div class="row">
             <div class="field">
                 <label>CAP</label>
-                <input type="text" name="zip" value="<?= val($p, 'zip') ?>" placeholder="20100">
+                <input type="text" name="zip" value="<?= val($p, 'zip') ?>" placeholder="00000">
             </div>
             <div class="field">
                 <label>Nazione</label>
