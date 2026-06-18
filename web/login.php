@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div style="text-align:center;margin-bottom:1.5rem">
         <img src="/assets/logo.svg" alt="IVS" style="width:72px;height:72px;border-radius:16px">
     </div>
-    <h1>Accesso</h1>
+    <h1 style="text-align:center">Accesso</h1>
 
     <?php if ($error): ?>
         <div class="uk-alert-<?= str_contains($error, 'riceverai') ? 'primary' : 'danger' ?> uk-margin" uk-alert>
