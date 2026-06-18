@@ -150,19 +150,21 @@
 }
 
 /* ── QR result ── */
-#result { display: none; margin-top: 2rem; text-align: center; }
+#result { display: none; max-width: 560px; margin-top: 2rem; text-align: center; }
 #result h2 { font-size: 1rem; font-weight: 600; color: #64748b; margin-bottom: 1rem; }
 #qr-img { width: 220px; height: 220px; border: 1px solid #e2e8f0; border-radius: 8px; display: block; margin: 0 auto 1.25rem; }
 .downloads { display: flex; gap: .75rem; justify-content: center; }
 .btn-dl {
+    display: inline-block;
     flex: 1; max-width: 160px; padding: .5rem;
     border-radius: 6px; font-size: .875rem; font-weight: 600;
-    text-decoration: none; text-align: center; transition: background .15s;
+    text-decoration: none !important; text-align: center; transition: background .15s, color .15s;
+    line-height: 1.8;
 }
-.btn-png { background: #f1f5f9; color: #1e293b; border: 1px solid #e2e8f0; }
-.btn-png:hover { background: #e2e8f0; }
-.btn-svg { background: #6366f1; color: #fff; border: 1px solid #6366f1; }
-.btn-svg:hover { background: #4f46e5; color: #fff; }
+.btn-png { background: #f1f5f9 !important; color: #1e293b !important; border: 1px solid #e2e8f0; }
+.btn-png:hover { background: #e2e8f0 !important; color: #1e293b !important; }
+.btn-svg { background: #6366f1 !important; color: #fff !important; border: 1px solid #6366f1; }
+.btn-svg:hover { background: #4f46e5 !important; color: #fff !important; }
 
 /* ── Alerts ── */
 .uk-alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; border-radius: 6px; }
