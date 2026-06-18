@@ -1,0 +1,116 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#3d5a9e"/>
+      <stop offset="100%" stop-color="#111e3c"/>
+    </radialGradient>
+    <radialGradient id="vp" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softglow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <clipPath id="left-rack">
+      <polygon points="0,0 88,52 88,148 0,200"/>
+    </clipPath>
+    <clipPath id="right-rack">
+      <polygon points="200,0 112,52 112,148 200,200"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="200" height="200" rx="26" fill="url(#bg)"/>
+
+  <!-- Left rack body -->
+  <polygon points="0,0 88,52 88,148 0,200" fill="#0d1e38"/>
+  <!-- Left rack unit lines -->
+  <g clip-path="url(#left-rack)" stroke="#1a3558" stroke-width="0.8" opacity="0.9">
+    <line x1="0" y1="14" x2="90" y2="14"/>
+    <line x1="0" y1="28" x2="90" y2="28"/>
+    <line x1="0" y1="42" x2="90" y2="42"/>
+    <line x1="0" y1="56" x2="90" y2="56"/>
+    <line x1="0" y1="70" x2="90" y2="70"/>
+    <line x1="0" y1="84" x2="90" y2="84"/>
+    <line x1="0" y1="98" x2="90" y2="98"/>
+    <line x1="0" y1="112" x2="90" y2="112"/>
+    <line x1="0" y1="126" x2="90" y2="126"/>
+    <line x1="0" y1="140" x2="90" y2="140"/>
+    <line x1="0" y1="154" x2="90" y2="154"/>
+    <line x1="0" y1="168" x2="90" y2="168"/>
+    <line x1="0" y1="182" x2="90" y2="182"/>
+    <line x1="0" y1="196" x2="90" y2="196"/>
+  </g>
+  <!-- Left rack edge -->
+  <line x1="88" y1="52" x2="88" y2="148" stroke="#243d5e" stroke-width="1.5"/>
+
+  <!-- Right rack body -->
+  <polygon points="200,0 112,52 112,148 200,200" fill="#0a1a30"/>
+  <!-- Right rack unit lines -->
+  <g clip-path="url(#right-rack)" stroke="#162d4a" stroke-width="0.8" opacity="0.9">
+    <line x1="110" y1="14" x2="200" y2="14"/>
+    <line x1="110" y1="28" x2="200" y2="28"/>
+    <line x1="110" y1="42" x2="200" y2="42"/>
+    <line x1="110" y1="56" x2="200" y2="56"/>
+    <line x1="110" y1="70" x2="200" y2="70"/>
+    <line x1="110" y1="84" x2="200" y2="84"/>
+    <line x1="110" y1="98" x2="200" y2="98"/>
+    <line x1="110" y1="112" x2="200" y2="112"/>
+    <line x1="110" y1="126" x2="200" y2="126"/>
+    <line x1="110" y1="140" x2="200" y2="140"/>
+    <line x1="110" y1="154" x2="200" y2="154"/>
+    <line x1="110" y1="168" x2="200" y2="168"/>
+    <line x1="110" y1="182" x2="200" y2="182"/>
+    <line x1="110" y1="196" x2="200" y2="196"/>
+  </g>
+  <!-- Right rack edge -->
+  <line x1="112" y1="52" x2="112" y2="148" stroke="#1e3352" stroke-width="1.5"/>
+
+  <!-- LED indicators — left rack -->
+  <circle cx="10" cy="21" r="2.2" fill="#00e676" filter="url(#softglow)"/>
+  <circle cx="10" cy="35" r="2.2" fill="#00b0ff" filter="url(#softglow)"/>
+  <circle cx="10" cy="49" r="2.2" fill="#00e676" filter="url(#softglow)"/>
+  <circle cx="10" cy="63" r="2.2" fill="#ff6d00" filter="url(#softglow)"/>
+  <circle cx="10" cy="77" r="2.2" fill="#00e676" filter="url(#softglow)"/>
+  <circle cx="10" cy="91" r="2.2" fill="#00b0ff" filter="url(#softglow)"/>
+  <circle cx="10" cy="105" r="2.2" fill="#00e676" filter="url(#softglow)"/>
+  <circle cx="10" cy="119" r="2.2" fill="#00e676" filter="url(#softglow)"/>
+  <circle cx="10" cy="133" r="2.2" fill="#00b0ff" filter="url(#softglow)"/>
+  <circle cx="10" cy="147" r="2.2" fill="#ff6d00" filter="url(#softglow)"/>
+  <circle cx="10" cy="161" r="2.2" fill="#00e676" filter="url(#softglow)"/>
+  <circle cx="10" cy="175" r="2.2" fill="#00b0ff" filter="url(#softglow)"/>
+
+  <!-- LED indicators — right rack -->
+  <circle cx="190" cy="21" r="2.2" fill="#00b0ff" filter="url(#softglow)"/>
+  <circle cx="190" cy="35" r="2.2" fill="#00e676" filter="url(#softglow)"/>
+  <circle cx="190" cy="49" r="2.2" fill="#00b0ff" filter="url(#softglow)"/>
+  <circle cx="190" cy="63" r="2.2" fill="#00e676" filter="url(#softglow)"/>
+  <circle cx="190" cy="77" r="2.2" fill="#ff6d00" filter="url(#softglow)"/>
+  <circle cx="190" cy="91" r="2.2" fill="#00e676" filter="url(#softglow)"/>
+  <circle cx="190" cy="105" r="2.2" fill="#00b0ff" filter="url(#softglow)"/>
+  <circle cx="190" cy="119" r="2.2" fill="#00e676" filter="url(#softglow)"/>
+  <circle cx="190" cy="133" r="2.2" fill="#00e676" filter="url(#softglow)"/>
+  <circle cx="190" cy="147" r="2.2" fill="#00b0ff" filter="url(#softglow)"/>
+  <circle cx="190" cy="161" r="2.2" fill="#00e676" filter="url(#softglow)"/>
+  <circle cx="190" cy="175" r="2.2" fill="#ff6d00" filter="url(#softglow)"/>
+
+  <!-- Vanishing point glow -->
+  <ellipse cx="100" cy="100" rx="55" ry="55" fill="url(#vp)"/>
+
+  <!-- Perspective lines to vanishing point -->
+  <line x1="88" y1="52"  x2="112" y2="52"  stroke="#2a4a72" stroke-width="0.8"/>
+  <line x1="88" y1="148" x2="112" y2="148" stroke="#2a4a72" stroke-width="0.8"/>
+
+  <!-- IVS — Daily Planet style: Impact, ultra bold, condensed -->
+  <text x="100" y="122"
+        font-family="Impact,'Arial Narrow',Arial,sans-serif"
+        font-size="80" font-weight="900"
+        fill="#ffffff"
+        text-anchor="middle"
+        letter-spacing="2">IVS</text>
+</svg>

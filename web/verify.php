@@ -70,6 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 <div class="auth-wrap">
 <div class="auth-card">
+    <div style="text-align:center;margin-bottom:1.5rem">
+        <img src="/assets/logo.svg" alt="IVS" style="width:72px;height:72px;border-radius:16px">
+    </div>
     <h1>Inserisci il codice</h1>
     <p class="uk-text-muted uk-text-small uk-margin-small-bottom">Abbiamo inviato un codice a 6 cifre alla tua email. Valido <?= OTP_EXPIRE_MINUTES ?> minuti.</p>
 

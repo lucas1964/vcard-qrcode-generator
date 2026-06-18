@@ -1,5 +1,6 @@
 output/
 *.png
 *.svg
+!web/assets/logo.svg
 web/qr_output/*
 !web/qr_output/.htaccess
