@@ -91,7 +91,9 @@ if (!is_dir($outDir) && !mkdir($outDir, 0755, true)) {
     exit;
 }
 
-$baseName = strtolower("{$firstName}_{$lastName}");
+$baseName = $org !== ''
+    ? strtolower("{$org}_{$firstName}-{$lastName}")
+    : strtolower("{$firstName}-{$lastName}");
 $baseName = preg_replace('/[^a-z0-9_\-]/', '_', $baseName);
 $pngPath  = "{$outDir}/{$baseName}.png";
 $svgPath  = "{$outDir}/{$baseName}.svg";
@@ -106,9 +108,10 @@ try {
 }
 
 write_log('qr_generated', $_SESSION['user_id'], [
-    'name'  => "{$firstName} {$lastName}",
-    'org'   => $org,
-    'vcard' => $vcard,
+    'name'     => "{$firstName} {$lastName}",
+    'org'      => $org,
+    'filename' => $baseName,
+    'vcard'    => $vcard,
 ]);
 
 $pngBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($pngPath));
