@@ -106,8 +106,9 @@ try {
 }
 
 write_log('qr_generated', $_SESSION['user_id'], [
-    'name' => "{$firstName} {$lastName}",
-    'org'  => $org,
+    'name'  => "{$firstName} {$lastName}",
+    'org'   => $org,
+    'vcard' => $vcard,
 ]);
 
 $pngBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($pngPath));
