@@ -5,9 +5,9 @@ require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/csrf.php';
 require_once __DIR__ . '/helpers.php';
-require_once __DIR__ . '/lib/phpmailer/PHPMailer.php';
-require_once __DIR__ . '/lib/phpmailer/SMTP.php';
-require_once __DIR__ . '/lib/phpmailer/PHPMailerException.php';
+require_once __DIR__ . '/lib/PHPMailer.php';
+require_once __DIR__ . '/lib/SMTP.php';
+require_once __DIR__ . '/lib/PHPMailerException.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 
