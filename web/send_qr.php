@@ -105,7 +105,39 @@ try {
     $mail->addAddress($toEmail);
     $mail->Subject  = "Il tuo QR Code — {$displayName}";
     $mail->isHTML(true);
-    $mail->Body     = email_wrap($body, 'Questa email è stata inviata automaticamente dal QR Generator di Informatica Valsusa.');
+    $logoUrl  = 'https://qr.ivs.ovh/assets/logo.svg';
+    $htmlBody = <<<HTML
+<!DOCTYPE html>
+<html lang="it">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:system-ui,-apple-system,Arial,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;padding:40px 20px">
+<tr><td align="center">
+<table cellpadding="0" cellspacing="0" style="max-width:560px;width:100%">
+  <tr>
+    <td align="center" style="background:#1e293b;border-radius:12px 12px 0 0;padding:36px 40px">
+      <img src="{$logoUrl}" alt="IVS" width="72" height="72" style="display:block;margin:0 auto 16px;border-radius:16px">
+      <h1 style="margin:0;font-size:22px;font-weight:700;color:#ffffff;letter-spacing:.5px">QR Code Generator</h1>
+      <p style="margin:8px 0 0;font-size:12px;color:#94a3b8;letter-spacing:2px;text-transform:uppercase">by Informatica Valsusa</p>
+    </td>
+  </tr>
+  <tr>
+    <td style="background:#ffffff;padding:40px;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0">
+      {$body}
+    </td>
+  </tr>
+  <tr>
+    <td align="center" style="background:#f8fafc;border:1px solid #e2e8f0;border-top:none;border-radius:0 0 12px 12px;padding:20px 40px">
+      <p style="margin:0;font-size:12px;color:#94a3b8;line-height:1.6">Questa email è stata inviata automaticamente dal QR Generator di Informatica Valsusa.</p>
+    </td>
+  </tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>
+HTML;
+    $mail->Body     = $htmlBody;
     $mail->AltBody  = $plain;
     $mail->addAttachment($tmpZip, "{$filename}.zip");
     $mail->send();

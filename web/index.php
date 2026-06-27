@@ -309,28 +309,19 @@ document.getElementById('form').addEventListener('submit', async function(e) {
         copyBtn.style.display = '';
         copyBtn.onclick = async function() {
             try {
-                if (navigator.clipboard && window.ClipboardItem) {
-                    const res2 = await fetch(pngInline);
-                    const blob = await res2.blob();
-                    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-                } else {
-                    // Fallback: draw on canvas and copy via execCommand (older browsers/Firefox)
-                    const img = document.getElementById('qr-img');
-                    const canvas = document.createElement('canvas');
-                    canvas.width = img.naturalWidth;
-                    canvas.height = img.naturalHeight;
-                    canvas.getContext('2d').drawImage(img, 0, 0);
-                    canvas.toBlob(function(blob) {
-                        const item = new ClipboardItem({ 'image/png': blob });
-                        navigator.clipboard.write([item]).catch(function() {});
-                    });
-                }
+                // Convert base64 data URL to Blob without fetch() (works in all browsers)
+                var b64 = pngInline.split(',')[1];
+                var binary = atob(b64);
+                var arr = new Uint8Array(binary.length);
+                for (var i = 0; i < binary.length; i++) arr[i] = binary.charCodeAt(i);
+                var blob = new Blob([arr], { type: 'image/png' });
+                await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
                 copyBtn.textContent = '✓ Copiato!';
                 setTimeout(function() { copyBtn.textContent = 'Copia immagine'; }, 2000);
             } catch (err) {
-                // Last resort: open image in new tab so user can copy manually
+                // Fallback: apri in nuovo tab per copia manuale
                 copyBtn.textContent = 'Apri immagine';
-                const w = window.open();
+                var w = window.open();
                 w.document.write('<img src="' + pngInline + '" style="max-width:100%">');
                 setTimeout(function() { copyBtn.textContent = 'Copia immagine'; }, 3000);
             }
