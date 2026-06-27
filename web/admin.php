@@ -89,6 +89,13 @@ $logs = db()->query(
      ORDER BY l.created_at DESC LIMIT 100'
 )->fetchAll();
 
+$stats = [];
+$stats['total_users'] = (int) db()->query('SELECT COUNT(*) FROM users')->fetchColumn();
+$stats['qr_today']    = (int) db()->query("SELECT COUNT(*) FROM logs WHERE event='qr_generated' AND DATE(created_at)=CURDATE()")->fetchColumn();
+$stats['qr_month']    = (int) db()->query("SELECT COUNT(*) FROM logs WHERE event='qr_generated' AND created_at >= DATE_FORMAT(NOW(),'%Y-%m-01')")->fetchColumn();
+$stats['active_30d']  = (int) db()->query("SELECT COUNT(DISTINCT user_id) FROM logs WHERE event='login_ok' AND created_at > DATE_SUB(NOW(), INTERVAL 30 DAY)")->fetchColumn();
+$lastLogin = db()->query("SELECT u.email, l.created_at FROM logs l JOIN users u ON u.id=l.user_id WHERE l.event='login_ok' ORDER BY l.created_at DESC LIMIT 1")->fetch();
+
 $eventLabels = [
     'otp_requested'  => '📧 OTP richiesto',
     'otp_send_failed'=> '❌ OTP fallito',
@@ -117,7 +124,43 @@ $eventLabels = [
 <?php include __DIR__ . '/sidebar.php'; ?>
 
 <div class="app-main">
-    <h1 class="page-title">Gestione utenti</h1>
+    <h1 class="page-title">Dashboard</h1>
+
+    <div class="uk-grid-small uk-child-width-1-2 uk-child-width-1-4@m uk-margin-medium-bottom" uk-grid>
+        <div>
+            <div class="stat-card">
+                <div class="stat-value"><?= $stats['total_users'] ?></div>
+                <div class="stat-label">Utenti totali</div>
+            </div>
+        </div>
+        <div>
+            <div class="stat-card">
+                <div class="stat-value"><?= $stats['qr_today'] ?></div>
+                <div class="stat-label">QR oggi</div>
+            </div>
+        </div>
+        <div>
+            <div class="stat-card">
+                <div class="stat-value"><?= $stats['qr_month'] ?></div>
+                <div class="stat-label">QR questo mese</div>
+            </div>
+        </div>
+        <div>
+            <div class="stat-card">
+                <div class="stat-value"><?= $stats['active_30d'] ?></div>
+                <div class="stat-label">Utenti attivi (30gg)</div>
+            </div>
+        </div>
+    </div>
+
+    <?php if ($lastLogin): ?>
+    <p class="uk-text-small uk-text-muted uk-margin-medium-bottom">
+        Ultimo accesso: <strong><?= htmlspecialchars($lastLogin['email']) ?></strong>
+        il <?= date('d/m/Y \a\l\l\e H:i', strtotime($lastLogin['created_at'])) ?>
+    </p>
+    <?php endif; ?>
+
+    <h2 class="page-title">Gestione utenti</h2>
 
     <?php if ($message): ?>
         <div class="uk-alert-<?= $msgType === 'error' ? 'danger' : 'success' ?> uk-margin" uk-alert>

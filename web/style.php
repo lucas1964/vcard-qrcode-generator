@@ -152,6 +152,26 @@
 /* ── QR result ── */
 #result { display: none; max-width: 560px; margin-top: 2rem; text-align: center; }
 #result h2 { font-size: 1rem; font-weight: 600; color: #64748b; margin-bottom: 1rem; }
+.stat-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    text-align: center;
+}
+.stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1e293b;
+    line-height: 1.1;
+}
+.stat-label {
+    font-size: .75rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-top: .35rem;
+}
 #qr-img { width: 220px; height: 220px; border: 1px solid #e2e8f0; border-radius: 8px; display: block; margin: 0 auto 1.25rem; }
 .downloads { display: flex; gap: .75rem; justify-content: center; }
 .btn-dl {
