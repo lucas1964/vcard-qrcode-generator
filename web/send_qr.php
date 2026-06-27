@@ -89,6 +89,7 @@ HTML;
 
 $plain = "Il tuo QR Code vCard per {$displayName} è in allegato.\n\nL'archivio ZIP contiene:\n- {$filename}.png (raster)\n- {$filename}.svg (vettoriale)\n\nLuigi Cassolini — Informatica Valsusa";
 
+$sendError = '';
 try {
     $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
     $mail->isSMTP();
@@ -109,8 +110,9 @@ try {
     $mail->addAttachment($tmpZip, "{$filename}.zip");
     $mail->send();
     $sent = true;
-} catch (Throwable) {
-    $sent = false;
+} catch (Throwable $e) {
+    $sent      = false;
+    $sendError = $e->getMessage();
 }
 
 @unlink($tmpZip);
@@ -119,6 +121,7 @@ if ($sent) {
     write_log('qr_sent', $_SESSION['user_id'], ['filename' => $filename, 'to' => $toEmail]);
     echo json_encode(['ok' => true, 'to' => $toEmail]);
 } else {
+    write_log('qr_send_failed', $_SESSION['user_id'], ['filename' => $filename, 'to' => $toEmail, 'error' => $sendError]);
     http_response_code(500);
     echo json_encode(['error' => 'Errore invio email. Contatta l\'amministratore.']);
 }

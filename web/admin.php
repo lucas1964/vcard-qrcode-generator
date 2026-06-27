@@ -110,6 +110,7 @@ $eventLabels = [
     'profile_updated'=> '✏️ Profilo aggiornato',
     'welcome_resent' => '📨 Benvenuto reinviato',
     'qr_sent'        => '📤 QR inviato per email',
+    'qr_send_failed' => '❌ QR invio fallito',
 ];
 ?>
 <!DOCTYPE html>
