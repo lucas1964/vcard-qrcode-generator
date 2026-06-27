@@ -35,7 +35,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'creat
             db()->prepare('INSERT INTO profiles (user_id) VALUES (?)')->execute([$uid]);
 
             write_log('user_created', $_SESSION['user_id'], ['new_email' => $email, 'is_admin' => $isAdmin]);
-            $message = "Utente {$email} creato.";
+            $sent    = send_welcome_email($email);
+            $message = "Utente {$email} creato" . ($sent ? ' ed email di benvenuto inviata.' : ' — invio email fallito, riprova con Reinvia.');
+            if (!$sent) $msgType = 'error';
         } catch (PDOException $e) {
             $message = 'Email già registrata.';
             $msgType = 'error';
@@ -56,6 +58,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
     } else {
         $message = 'Non puoi eliminare te stesso.';
         $msgType = 'error';
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'resend') {
+    $uid = (int)($_POST['user_id'] ?? 0);
+    if ($uid) {
+        $row = db()->prepare('SELECT email FROM users WHERE id = ?');
+        $row->execute([$uid]);
+        $resend_email = $row->fetchColumn();
+        if ($resend_email) {
+            $sent    = send_welcome_email($resend_email);
+            $message = $sent ? "Email di benvenuto reinviata a {$resend_email}." : 'Invio email fallito. Controlla la configurazione SMTP.';
+            $msgType = $sent ? 'success' : 'error';
+            write_log('welcome_resent', $_SESSION['user_id'], ['to' => $resend_email, 'ok' => $sent]);
+        }
     }
 }
 
@@ -84,6 +101,7 @@ $eventLabels = [
     'user_created'   => '👤 Utente creato',
     'user_deleted'   => '🗑️ Utente eliminato',
     'profile_updated'=> '✏️ Profilo aggiornato',
+    'welcome_resent' => '📨 Benvenuto reinviato',
 ];
 ?>
 <!DOCTYPE html>
@@ -150,9 +168,15 @@ $eventLabels = [
                     <?php endif; ?>
                 </td>
                 <td class="uk-text-small"><?= date('d/m/Y', strtotime($u['created_at'])) ?></td>
-                <td>
+                <td style="white-space:nowrap">
+                    <form method="post" style="display:inline" onsubmit="return confirm('Reinviare l\'email di benvenuto a <?= htmlspecialchars($u['email']) ?>?')">
+                        <input type="hidden" name="action" value="resend">
+                        <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
+                        <?= csrf_field() ?>
+                        <button type="submit" class="uk-button uk-button-default" style="padding:.25rem .6rem;font-size:.8rem;height:auto;line-height:1.5">Reinvia</button>
+                    </form>
                     <?php if ($u['id'] !== $_SESSION['user_id']): ?>
-                    <form method="post" onsubmit="return confirm('Eliminare questo utente?')">
+                    <form method="post" style="display:inline" onsubmit="return confirm('Eliminare questo utente?')">
                         <input type="hidden" name="action" value="delete">
                         <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
                         <?= csrf_field() ?>
