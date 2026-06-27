@@ -109,6 +109,7 @@ $eventLabels = [
     'user_deleted'   => '🗑️ Utente eliminato',
     'profile_updated'=> '✏️ Profilo aggiornato',
     'welcome_resent' => '📨 Benvenuto reinviato',
+    'qr_sent'        => '📤 QR inviato per email',
 ];
 ?>
 <!DOCTYPE html>

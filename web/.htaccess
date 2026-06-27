@@ -13,7 +13,7 @@ ErrorDocument 403 /403.php
 
     # Rimuove .php dagli URL — ESCLUDI i file che ricevono POST
     RewriteCond %{THE_REQUEST} \.php [NC]
-    RewriteCond %{REQUEST_URI} !^/(generate|download|regenerate)\.php [NC]
+    RewriteCond %{REQUEST_URI} !^/(generate|download|regenerate|send_qr)\.php [NC]
     RewriteRule ^([^.]+)\.php$ /$1 [R=301,L]
 
     # Serve il file .php quando si visita l'URL senza estensione

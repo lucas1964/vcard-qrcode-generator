@@ -178,6 +178,12 @@ function val(array $p, string $key): string {
             <a class="btn-dl btn-svg" id="dl-svg" href="#" download>Scarica SVG</a>
             <button class="btn-dl btn-copy" id="btn-copy" type="button" style="display:none">Copia immagine</button>
         </div>
+        <div style="text-align:center;margin-top:.75rem">
+            <button class="uk-button uk-button-default uk-button-small" id="btn-send-email" type="button" style="display:none">
+                <span uk-icon="icon:mail; ratio:.8" style="margin-right:.3rem"></span> Invia per email
+            </button>
+            <p id="send-status" style="display:none;font-size:.8rem;margin:.5rem 0 0;color:#64748b"></p>
+        </div>
     </div>
 </div>
 
@@ -255,11 +261,49 @@ document.getElementById('form').addEventListener('submit', async function(e) {
             return;
         }
         const pngInline = json.png_inline;
+        const currentFilename = json.filename;
         document.getElementById('qr-img').src = pngInline;
-        document.getElementById('dl-png').href = 'download.php?f=' + json.filename + '.png';
-        document.getElementById('dl-png').download = json.filename + '.png';
-        document.getElementById('dl-svg').href = 'download.php?f=' + json.filename + '.svg';
-        document.getElementById('dl-svg').download = json.filename + '.svg';
+        document.getElementById('dl-png').href = 'download.php?f=' + currentFilename + '.png';
+        document.getElementById('dl-png').download = currentFilename + '.png';
+        document.getElementById('dl-svg').href = 'download.php?f=' + currentFilename + '.svg';
+        document.getElementById('dl-svg').download = currentFilename + '.svg';
+
+        const sendBtn = document.getElementById('btn-send-email');
+        const sendStatus = document.getElementById('send-status');
+        sendBtn.style.display = '';
+        sendStatus.style.display = 'none';
+        sendBtn.textContent = '';
+        sendBtn.innerHTML = '<span uk-icon="icon:mail; ratio:.8" style="margin-right:.3rem"></span> Invia per email';
+        sendBtn.disabled = false;
+        sendBtn.onclick = async function() {
+            sendBtn.disabled = true;
+            sendBtn.textContent = 'Invio in corso…';
+            sendStatus.style.display = 'none';
+            const fd2 = new FormData();
+            fd2.append('filename', currentFilename);
+            fd2.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
+            try {
+                const r = await fetch('send_qr.php', { method: 'POST', body: fd2 });
+                const j = await r.json();
+                if (j.ok) {
+                    sendBtn.textContent = '✓ Inviato!';
+                    sendStatus.textContent = 'ZIP inviato a ' + j.to;
+                    sendStatus.style.color = '#16a34a';
+                } else {
+                    sendBtn.innerHTML = '<span uk-icon="icon:mail; ratio:.8" style="margin-right:.3rem"></span> Invia per email';
+                    sendBtn.disabled = false;
+                    sendStatus.textContent = j.error || 'Errore invio.';
+                    sendStatus.style.color = '#dc2626';
+                }
+                sendStatus.style.display = 'block';
+            } catch (err) {
+                sendBtn.innerHTML = '<span uk-icon="icon:mail; ratio:.8" style="margin-right:.3rem"></span> Invia per email';
+                sendBtn.disabled = false;
+                sendStatus.textContent = 'Errore di rete. Riprova.';
+                sendStatus.style.color = '#dc2626';
+                sendStatus.style.display = 'block';
+            }
+        };
 
         const copyBtn = document.getElementById('btn-copy');
         copyBtn.style.display = '';
