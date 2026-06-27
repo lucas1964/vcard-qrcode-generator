@@ -10,6 +10,11 @@
             <span uk-icon="icon: user; ratio: .85"></span>Profilo
         </a>
     </li>
+    <li class="<?= $cur === 'history.php' ? 'uk-active' : '' ?>">
+        <a href="history.php">
+            <span uk-icon="icon: history; ratio: .85"></span>Storico
+        </a>
+    </li>
     <?php if (!empty($_SESSION['is_admin'])): ?>
     <li class="<?= $cur === 'admin.php' ? 'uk-active' : '' ?>">
         <a href="admin.php">

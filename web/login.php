@@ -32,40 +32,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = $user->fetch();
 
         if ($user) {
-            $otp  = str_pad((string)random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-            $hash = hash('sha256', $otp);
-            $exp  = date('Y-m-d H:i:s', strtotime('+' . OTP_EXPIRE_MINUTES . ' minutes'));
+            $rateCheck = db()->prepare(
+                'SELECT COUNT(*) FROM otp_tokens WHERE user_id = ? AND created_at > DATE_SUB(NOW(), INTERVAL 10 MINUTE)'
+            );
+            $rateCheck->execute([$user['id']]);
+            $recentCount = (int)$rateCheck->fetchColumn();
 
-            db()->prepare('UPDATE otp_tokens SET used = 1 WHERE user_id = ?')
-               ->execute([$user['id']]);
+            if ($recentCount >= 3) {
+                $error = 'Troppi tentativi. Attendi qualche minuto prima di richiedere un nuovo codice.';
+            } else {
+                $otp  = str_pad((string)random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+                $hash = hash('sha256', $otp);
+                $exp  = date('Y-m-d H:i:s', strtotime('+' . OTP_EXPIRE_MINUTES . ' minutes'));
 
-            db()->prepare('INSERT INTO otp_tokens (user_id, token_hash, expires_at) VALUES (?, ?, ?)')
-               ->execute([$user['id'], $hash, $exp]);
+                db()->prepare('UPDATE otp_tokens SET used = 1 WHERE user_id = ?')
+                   ->execute([$user['id']]);
 
-            $mail = new PHPMailer(true);
-            try {
-                $mail->isSMTP();
-                $mail->Host       = SMTP_HOST;
-                $mail->SMTPAuth   = true;
-                $mail->Username   = SMTP_USER;
-                $mail->Password   = SMTP_PASS;
-                $mail->SMTPSecure = SMTP_ENCRYPTION;
-                $mail->Port       = SMTP_PORT;
-                $mail->CharSet    = 'UTF-8';
-                $mail->setFrom(SMTP_USER, SMTP_FROM_NAME);
-                $mail->addReplyTo(SMTP_REPLY_TO);
-                $mail->addAddress($email);
-                $mail->Subject = 'Il tuo codice di accesso';
-                $mail->Body    = "Il tuo codice di accesso è:\n\n{$otp}\n\nValido per " . OTP_EXPIRE_MINUTES . " minuti.";
-                $mail->send();
+                db()->prepare('INSERT INTO otp_tokens (user_id, token_hash, expires_at) VALUES (?, ?, ?)')
+                   ->execute([$user['id'], $hash, $exp]);
 
-                $_SESSION['otp_user_id'] = $user['id'];
-                write_log('otp_requested', $user['id'], ['email' => $email]);
-                header('Location: verify.php');
-                exit;
-            } catch (Exception $e) {
-                write_log('otp_send_failed', $user['id'], ['email' => $email, 'error' => $e->getMessage()]);
-                $error = 'Errore invio email. Contatta l\'amministratore.';
+                $mail = new PHPMailer(true);
+                try {
+                    $mail->isSMTP();
+                    $mail->Host       = SMTP_HOST;
+                    $mail->SMTPAuth   = true;
+                    $mail->Username   = SMTP_USER;
+                    $mail->Password   = SMTP_PASS;
+                    $mail->SMTPSecure = SMTP_ENCRYPTION;
+                    $mail->Port       = SMTP_PORT;
+                    $mail->CharSet    = 'UTF-8';
+                    $mail->setFrom(SMTP_USER, SMTP_FROM_NAME);
+                    $mail->addReplyTo(SMTP_REPLY_TO);
+                    $mail->addAddress($email);
+                    $mail->Subject = 'Il tuo codice di accesso';
+                    $mail->Body    = "Il tuo codice di accesso è:\n\n{$otp}\n\nValido per " . OTP_EXPIRE_MINUTES . " minuti.";
+                    $mail->send();
+
+                    $_SESSION['otp_user_id'] = $user['id'];
+                    write_log('otp_requested', $user['id'], ['email' => $email]);
+                    header('Location: verify.php');
+                    exit;
+                } catch (Exception $e) {
+                    write_log('otp_send_failed', $user['id'], ['email' => $email, 'error' => $e->getMessage()]);
+                    $error = 'Errore invio email. Contatta l\'amministratore.';
+                }
             }
         } else {
             $error = 'Se l\'email è registrata riceverai il codice a breve.';

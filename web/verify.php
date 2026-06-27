@@ -45,11 +45,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_id'] = $_SESSION['otp_user_id'];
             unset($_SESSION['otp_user_id']);
 
-            $u = db()->prepare('SELECT is_admin FROM users WHERE id = ?');
+            $u = db()->prepare('SELECT email, is_admin FROM users WHERE id = ?');
             $u->execute([$_SESSION['user_id']]);
-            $_SESSION['is_admin'] = (bool)($u->fetch()['is_admin'] ?? false);
+            $uRow = $u->fetch();
+            $_SESSION['is_admin'] = (bool)($uRow['is_admin'] ?? false);
+            $userEmail = $uRow['email'] ?? '';
 
-            write_log('login_ok', $_SESSION['user_id']);
+            $cntStmt = db()->prepare('SELECT COUNT(*) FROM logs WHERE user_id = ? AND event = ?');
+            $cntStmt->execute([$_SESSION['user_id'], 'login_ok']);
+            $isFirstLogin = ((int) $cntStmt->fetchColumn()) === 0;
+
+            if ($isFirstLogin && $userEmail !== '') {
+                send_admin_notification($userEmail);
+            }
+
+            write_log('login_ok', $_SESSION['user_id'], $isFirstLogin ? ['first_login' => true] : []);
             header('Location: index.php');
             exit;
         } else {

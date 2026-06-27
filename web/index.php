@@ -159,6 +159,15 @@ function val(array $p, string $key): string {
         <button class="uk-button uk-button-primary uk-width-1-1 uk-margin-small-top" type="submit">Genera QR Code</button>
     </form>
 
+    <ul class="uk-accordion uk-margin-top" style="max-width:560px" uk-accordion>
+        <li>
+            <a class="uk-accordion-title" href="#">Anteprima vCard</a>
+            <div class="uk-accordion-content">
+                <pre id="vcard-preview" style="background:#f8f8f8;padding:12px;border:1px solid #e0e0e0;border-radius:4px;font-size:0.85em;white-space:pre-wrap;word-break:break-all;"></pre>
+            </div>
+        </li>
+    </ul>
+
     <div class="uk-alert-danger uk-margin-top" id="error" style="display:none" uk-alert></div>
 
     <div id="result">
@@ -167,6 +176,7 @@ function val(array $p, string $key): string {
         <div class="downloads">
             <a class="btn-dl btn-png" id="dl-png" href="#" download>Scarica PNG</a>
             <a class="btn-dl btn-svg" id="dl-svg" href="#" download>Scarica SVG</a>
+            <button class="btn-dl btn-copy" id="btn-copy" type="button" style="display:none">Copia immagine</button>
         </div>
     </div>
 </div>
@@ -178,6 +188,56 @@ document.querySelectorAll('input[type="tel"]').forEach(function(el) {
         if (v && !v.startsWith('+')) this.value = '+39 ' + v;
     });
 });
+
+function buildVCard() {
+    var form = document.getElementById('form');
+    var fd = new FormData(form);
+    var first = (fd.get('first_name') || '').trim();
+    var last  = (fd.get('last_name')  || '').trim();
+    var org   = (fd.get('org')        || '').trim();
+    var title = (fd.get('title')      || '').trim();
+    var tel_work = (fd.get('tel_work') || '').trim();
+    var tel_ext  = (fd.get('tel_ext')  || '').trim();
+    var tel_cell = (fd.get('tel_cell') || '').trim();
+    var email  = (fd.get('email') || '').trim();
+    var web    = (fd.get('web')   || '').trim();
+    var street   = (fd.get('street')   || '').trim();
+    var city     = (fd.get('city')     || '').trim();
+    var province = (fd.get('province') || '').trim();
+    var zip      = (fd.get('zip')      || '').trim();
+    var country  = (fd.get('country')  || '').trim();
+
+    var lines = [];
+    lines.push('BEGIN:VCARD');
+    lines.push('VERSION:3.0');
+    lines.push('N:' + last + ';' + first + ';;;');
+    lines.push('FN:' + (first + ' ' + last).trim());
+    if (org)   lines.push('ORG:' + org);
+    if (title) lines.push('TITLE:' + title);
+    if (tel_work) {
+        var tel_line = 'TEL;TYPE=WORK,voice:' + tel_work;
+        if (tel_ext) tel_line += ',,' + tel_ext;
+        lines.push(tel_line);
+    }
+    if (tel_cell) lines.push('TEL;TYPE=cell:' + tel_cell);
+    if (email) lines.push('EMAIL:' + email);
+    if (web)   lines.push('URL:' + web);
+    if (street || city || province || zip || country) {
+        lines.push('ADR;TYPE=WORK:;;' + street + ';' + city + ';' + province + ';' + zip + ';' + country);
+    }
+    lines.push('END:VCARD');
+    return lines.join('\r\n');
+}
+
+function updateVCardPreview() {
+    document.getElementById('vcard-preview').textContent = buildVCard();
+}
+
+document.getElementById('form').querySelectorAll('input').forEach(function(el) {
+    el.addEventListener('input', updateVCardPreview);
+});
+
+updateVCardPreview();
 
 document.getElementById('form').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -194,11 +254,30 @@ document.getElementById('form').addEventListener('submit', async function(e) {
             errorEl.style.display = 'block';
             return;
         }
-        document.getElementById('qr-img').src = json.png_inline;
+        const pngInline = json.png_inline;
+        document.getElementById('qr-img').src = pngInline;
         document.getElementById('dl-png').href = 'download.php?f=' + json.filename + '.png';
         document.getElementById('dl-png').download = json.filename + '.png';
         document.getElementById('dl-svg').href = 'download.php?f=' + json.filename + '.svg';
         document.getElementById('dl-svg').download = json.filename + '.svg';
+
+        const copyBtn = document.getElementById('btn-copy');
+        copyBtn.style.display = '';
+        copyBtn.onclick = async function() {
+            try {
+                const res2 = await fetch(pngInline);
+                const blob = await res2.blob();
+                await navigator.clipboard.write([
+                    new ClipboardItem({ 'image/png': blob })
+                ]);
+                copyBtn.textContent = '✓ Copiato!';
+                setTimeout(function() { copyBtn.textContent = 'Copia immagine'; }, 2000);
+            } catch (err) {
+                copyBtn.textContent = 'Errore copia';
+                setTimeout(function() { copyBtn.textContent = 'Copia immagine'; }, 2000);
+            }
+        };
+
         resultEl.style.display = 'block';
         resultEl.scrollIntoView({ behavior: 'smooth' });
     } catch (err) {
