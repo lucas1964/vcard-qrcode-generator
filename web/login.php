@@ -11,7 +11,7 @@ require_once __DIR__ . '/lib/phpmailer/PHPMailerException.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 
-session_start();
+require_once __DIR__ . '/session.php';
 
 if (isset($_SESSION['user_id'])) {
     header('Location: index.php');

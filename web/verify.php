@@ -6,7 +6,7 @@ require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/csrf.php';
 require_once __DIR__ . '/helpers.php';
 
-session_start();
+require_once __DIR__ . '/session.php';
 
 if (isset($_SESSION['user_id'])) {
     header('Location: index.php');
@@ -20,7 +20,18 @@ if (!isset($_SESSION['otp_user_id'])) {
 
 $error = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// Rate limiting: max 5 tentativi OTP sbagliati negli ultimi 15 minuti
+$failCount = db()->prepare(
+    "SELECT COUNT(*) FROM logs
+     WHERE user_id = ? AND event = 'login_failed'
+     AND created_at > DATE_SUB(NOW(), INTERVAL 15 MINUTE)"
+);
+$failCount->execute([$_SESSION['otp_user_id']]);
+if ((int)$failCount->fetchColumn() >= 5) {
+    $error = 'Troppi tentativi falliti. Richiedi un nuovo codice.';
+}
+
+if (!$error && $_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_verify();
     $otp = preg_replace('/\D/', '', $_POST['otp'] ?? '');
 
@@ -44,6 +55,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $_SESSION['user_id'] = $_SESSION['otp_user_id'];
             unset($_SESSION['otp_user_id']);
+
+            // Previene session fixation
+            session_regenerate_id(true);
 
             $u = db()->prepare('SELECT email, is_admin FROM users WHERE id = ?');
             $u->execute([$_SESSION['user_id']]);
