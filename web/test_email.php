@@ -2,9 +2,9 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/PHPMailer.php';
-require_once __DIR__ . '/SMTP.php';
-require_once __DIR__ . '/PHPMailerException.php';
+require_once __DIR__ . '/lib/phpmailer/PHPMailer.php';
+require_once __DIR__ . '/lib/phpmailer/SMTP.php';
+require_once __DIR__ . '/lib/phpmailer/PHPMailerException.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 
