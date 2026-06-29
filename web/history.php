@@ -78,6 +78,12 @@ foreach ($rows as $row) {
                 <span uk-icon="icon: code; ratio:.85"></span> Scarica SVG
             </a>
         </div>
+        <div style="text-align:center;margin-top:.75rem">
+            <button class="uk-button uk-button-default uk-button-small" id="regen-btn-send" type="button" style="display:none">
+                <span uk-icon="icon:mail; ratio:.8" style="margin-right:.3rem"></span> Invia per email
+            </button>
+            <p id="regen-send-status" style="display:none;font-size:.8rem;margin:.5rem 0 0;color:#64748b"></p>
+        </div>
     </div>
 
     <?php if (empty($entries)): ?>
@@ -154,15 +160,54 @@ foreach ($rows as $row) {
                         alertEl.innerHTML = '<div class="uk-alert-danger uk-alert"><p>' + data.error + '</p></div>';
                         alertEl.style.display = 'block';
                     } else {
-                        var qrImg  = document.getElementById('regen-qr-img');
-                        var dlPng  = document.getElementById('regen-dl-png');
-                        var dlSvg  = document.getElementById('regen-dl-svg');
+                        var qrImg   = document.getElementById('regen-qr-img');
+                        var dlPng   = document.getElementById('regen-dl-png');
+                        var dlSvg   = document.getElementById('regen-dl-svg');
+                        var sendBtn = document.getElementById('regen-btn-send');
+                        var sendSt  = document.getElementById('regen-send-status');
 
                         qrImg.src        = data.png_inline;
                         dlPng.href       = data.png_inline;
                         dlPng.download   = data.filename + '.png';
                         dlSvg.href       = 'download.php?file=' + encodeURIComponent(data.filename) + '&type=svg';
                         dlSvg.download   = data.filename + '.svg';
+
+                        // Reset send button for this (possibly different) filename
+                        sendBtn.style.display = '';
+                        sendBtn.disabled      = false;
+                        sendBtn.innerHTML     = '<span uk-icon="icon:mail; ratio:.8" style="margin-right:.3rem"></span> Invia per email';
+                        sendSt.style.display  = 'none';
+                        UIkit.update(sendBtn);
+
+                        sendBtn.onclick = async function () {
+                            sendBtn.disabled  = true;
+                            sendBtn.textContent = 'Invio in corso…';
+                            sendSt.style.display = 'none';
+                            var fd2 = new FormData();
+                            fd2.append('filename',   data.filename);
+                            fd2.append('csrf_token', csrfToken);
+                            try {
+                                var r2 = await fetch('send_qr.php', { method: 'POST', body: fd2 });
+                                var j2 = await r2.json();
+                                if (j2.ok) {
+                                    sendBtn.textContent  = '✓ Inviato!';
+                                    sendSt.textContent   = 'ZIP inviato a ' + j2.to;
+                                    sendSt.style.color   = '#16a34a';
+                                } else {
+                                    sendBtn.innerHTML    = '<span uk-icon="icon:mail; ratio:.8" style="margin-right:.3rem"></span> Invia per email';
+                                    sendBtn.disabled     = false;
+                                    sendSt.textContent   = j2.error || 'Errore invio.';
+                                    sendSt.style.color   = '#dc2626';
+                                }
+                                sendSt.style.display = 'block';
+                            } catch (e) {
+                                sendBtn.innerHTML    = '<span uk-icon="icon:mail; ratio:.8" style="margin-right:.3rem"></span> Invia per email';
+                                sendBtn.disabled     = false;
+                                sendSt.textContent   = 'Errore di rete. Riprova.';
+                                sendSt.style.color   = '#dc2626';
+                                sendSt.style.display = 'block';
+                            }
+                        };
 
                         resultEl.style.display = 'block';
                         resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
